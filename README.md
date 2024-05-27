@@ -19,7 +19,7 @@ The overall structure of pathViz consists of two parts:
 
 1. Make sure you have the requirements above, as well as the latest version of [pip](https://pypi.org/project/pip/) installed on your system
 2. Clone the `pathViz/` repo
-3. Open up your command-line and `cd` into the `pathViz` directory, wherever you downloaded it to, then run pipenv w/ `pipenv install pathViz`
+3. Open up your command-line and `cd` into the `pathViz` directory, wherever you downloaded it to, then run pipenv w/ `pipenv install`
    1. This will take a few minutes, while it downloads the relevant python packages.
 4. Locate the `logPaths.lua` script, and update the `filePrefix` variable at the top.
    1. Change this value to the location of your `pathViz/data/` directory; in my case it is `C:/Users/rocke/Documents/pathViz/data/`
