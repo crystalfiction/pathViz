@@ -24,7 +24,8 @@ The overall structure of pathViz consists of two parts:
 4. Locate the `logPaths.lua` script, and update the `filePrefix` variable at the top.
    1. Change this value to the location of your `pathViz/data/` directory; in my case it is `C:/Users/rocke/Documents/pathViz/data/`
 5. Locate your game directory, then move the `logPaths.lua` script from the `pathViz/` folder to the `/hack/scripts/` sub-directory
-   1. This ensures dfhack will recognize this script from the ingame console
+   1. <u>If the game has already been launched</u>, you will need to open the ingame dfhack console with tilde: \`, then run `:lua require('script-manager').rescan()`
+   2. This ensures dfhack will recognize this script from the ingame console
 6. Locate the `.env` file in `pathViz/`
    1. Change the `DATA_DIR` and `OUTPUT_DIR` environment variables to the relative path of `data/` and `output/` in `pathViz/` respectively; i.e. `DATA_DIR='data/'` and `OUTPUT_DIR='output/`
    2. These variables are useful if you would like to split your data into sub-directories (multiple forts, a/b testing, etc.)
