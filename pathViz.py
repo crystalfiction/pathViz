@@ -114,7 +114,31 @@ def save_data(mode, data):
         return print("File already exists...")
 
 
+def test_logs():
+    logs = os.listdir(DATA_DIR)
+    # test logs...
+    for l in logs:
+        logPath = DATA_DIR + l
+        test = None
+        with open(logPath, "r") as f:
+            content = f.readline()
+            if content == "":
+                test = True
+
+        # if test passed...
+        if test is not None:
+            # delete the empty log
+            os.remove(logPath)
+
+
 def main():
+    # ensure directories exist
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
+
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+
     # create argparser
     parser = argparse.ArgumentParser(
         description="pathViz generates statistics and visuals of dwarf paths based on vector data",
@@ -131,6 +155,9 @@ def main():
     # test args
     if args.mode == "import":
         # if import mode...
+        # cleanup any empty logs
+        test_logs()
+
         # parse logs
         parse_logs(DATA_DIR)
 
@@ -152,11 +179,12 @@ def main():
         # if stats mode
         stats = generate_stats()
 
-        if args.s:
-            save_data(args.mode, stats)
+        if stats is not None:
+            if args.s:
+                save_data(args.mode, stats)
 
-        for s in stats:
-            print(s)
+            for s in stats:
+                print(s)
 
     elif args.mode == "clear":
         # if clear mode

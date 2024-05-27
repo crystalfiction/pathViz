@@ -1,2 +1,7 @@
 .venv/
 __pycache__
+data/
+scriptLog.txt
+logPaths.lua
+snapshots.csv
+snapshots.json

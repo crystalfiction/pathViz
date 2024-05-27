@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from parse_goals import parse_keys
@@ -45,6 +46,11 @@ def get_avg_snapshot_distance(paths):
 
 
 def generate_stats():
+    # break case
+    if not os.path.exists("snapshots.csv"):
+        print("No data found... please 'import' first.")
+        return None
+
     print("Generating stats...")
     print("-------------------")
 
