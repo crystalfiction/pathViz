@@ -13,15 +13,22 @@ The overall structure of pathViz consists of two parts:
 
 ## Setup
 
-1. Make sure you have [Python 3.10.11](https://www.python.org/downloads/release/python-31011/) installed on your system
-2. Download the `pathViz/` repo
-3. Locate the `logPaths.lua` script, and update the `filePrefix` variable at the top.
+<b>Requirements:</b>
+- [Python 3.10.11](https://www.python.org/downloads/release/python-31011/)
+- [pipenv 2023.12.1](https://pypi.org/project/pipenv/2023.12.1/)
+
+1. Make sure you have the requirements above, as well as the latest version of [pip](https://pypi.org/project/pip/) installed on your system
+2. Clone the `pathViz/` repo
+3. Open up your command-line and `cd` into the `pathViz` directory, wherever you downloaded it to, then run pipenv w/ `pipenv install pathViz`
+   1. This will take a few minutes, while it downloads the relevant python packages.
+4. Locate the `logPaths.lua` script, and update the `filePrefix` variable at the top.
    1. Change this value to the location of your `pathViz/data/` directory; in my case it is `C:/Users/rocke/Documents/pathViz/data/`
-4. Locate your game directory, then move the `logPaths.lua` script from the `pathViz/` folder to the `/hack/scripts/` sub-directory
+5. Locate your game directory, then move the `logPaths.lua` script from the `pathViz/` folder to the `/hack/scripts/` sub-directory
    1. This ensures dfhack will recognize this script from the ingame console
-5. Locate the `.env` file in `pathViz/`
+6. Locate the `.env` file in `pathViz/`
    1. Change the `DATA_DIR` and `OUTPUT_DIR` environment variables to the relative path of `data/` and `output/` in `pathViz/` respectively; i.e. `DATA_DIR='data/'` and `OUTPUT_DIR='output/`
    2. These variables are useful if you would like to split your data into sub-directories (multiple forts, a/b testing, etc.)
+7. Finally, before running any commands, go back to your command-line, make sure its still in the `pathViz/` directory, then run `pipenv shell`
 
 
 ## Usage
