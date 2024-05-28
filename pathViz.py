@@ -9,6 +9,7 @@ import math
 import statistics
 import time
 import typer
+from enum import Enum
 
 import pandas as pd
 import numpy as np
@@ -131,7 +132,14 @@ def test_logs():
             os.remove(logPath)
 
 
-def main(mode: str, save: bool = False):
+# define the mode choices
+class Modes(str, Enum):
+    load = "load"
+    viz = "viz"
+    clear = "clear"
+
+
+def main(mode: Modes):
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
@@ -140,8 +148,8 @@ def main(mode: str, save: bool = False):
         os.mkdir(OUTPUT_DIR)
 
     # test args
-    if mode == "import":
-        # if import mode...
+    if mode == "load":
+        # if load mode...
         # cleanup any empty logs
         test_logs()
 
@@ -153,7 +161,8 @@ def main(mode: str, save: bool = False):
         fig = make_visuals()
 
         # if save flagged
-        if save is not False:
+        doSave = typer.prompt("Export to file? [y/n]")
+        if doSave.lower() != "n":
             save_data(mode, fig)
 
         # show fig regardless
@@ -161,17 +170,6 @@ def main(mode: str, save: bool = False):
             fig.show()
         else:
             return print("No data found... please 'import' first.")
-
-    elif mode == "stats":
-        # if stats mode
-        stats = generate_stats()
-
-        if stats is not None:
-            if save is not False:
-                save_data(mode, stats)
-
-            for s in stats:
-                print(s)
 
     elif mode == "clear":
         # if clear mode
