@@ -3,24 +3,17 @@
 """
 
 import os
-import sys
-import logging
-import math
-import statistics
 import time
 import typer
 from enum import Enum
 
 import pandas as pd
-import numpy as np
-from scipy.spatial.distance import pdist, squareform
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from dotenv import load_dotenv
 
 from parse import parse_logs
 from visualize import make_visuals
-from query import query
 
 
 load_dotenv()
@@ -169,14 +162,6 @@ def main(mode: Modes):
         # show fig regardless
         if fig is not None:
             fig.show()
-        else:
-            return print("No data found... please 'import' first.")
-
-    elif mode == "query":
-        # if data exists
-        if os.path.exists("snapshots.csv"):
-            # query
-            query()
         else:
             return print("No data found... please 'import' first.")
 
