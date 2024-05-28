@@ -173,7 +173,9 @@ def main(mode: Modes):
             return print("No data found... please 'import' first.")
 
     elif mode == "query":
+        # if data exists
         if os.path.exists("snapshots.csv"):
+            # query
             query()
         else:
             return print("No data found... please 'import' first.")
