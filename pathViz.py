@@ -114,6 +114,23 @@ def save_data(mode, data):
         return print("File already exists...")
 
 
+def test_logs():
+    logs = os.listdir(DATA_DIR)
+    # test logs...
+    for l in logs:
+        logPath = DATA_DIR + l
+        test = None
+        with open(logPath, "r") as f:
+            content = f.readline()
+            if content == "":
+                test = True
+
+        # if test passed...
+        if test is not None:
+            # delete the empty log
+            os.remove(logPath)
+
+
 def main():
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
@@ -138,6 +155,9 @@ def main():
     # test args
     if args.mode == "import":
         # if import mode...
+        # cleanup any empty logs
+        test_logs()
+
         # parse logs
         parse_logs(DATA_DIR)
 

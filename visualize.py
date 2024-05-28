@@ -6,9 +6,12 @@ import plotly.graph_objects as go
 import itertools
 import math
 from sklearn.cluster import KMeans
+from parse_goals import parse_keys
 
 col_pal = px.colors.qualitative.Plotly
 col_pal_iter = itertools.cycle(col_pal)
+
+GOAL_KEY = {}
 
 
 def get_kmeans(data):
@@ -27,6 +30,8 @@ def get_kmeans(data):
 
 def create_visuals(df):
     print("Creating visuals...")
+
+    GOAL_KEY = parse_keys()
 
     # define plotly fig
     fig = go.Figure()
@@ -52,14 +57,17 @@ def create_visuals(df):
         for i, p in enumerate(pid_uniques):
             # filter df for current path
             vectors = filtered[filtered["path_id"] == p]
-
+            # sort vectors by path_goal
+            vectors = vectors.sort_values(by=["path_goal"])
+            # get common goal for path
+            goal = vectors["path_goal"].mode()[0]
             trace = go.Scatter3d(
                 x=vectors["x"],
                 y=vectors["y"],
                 z=vectors["z"],
-                name=str(p),
+                name=str(GOAL_KEY[goal]),
                 mode="markers+lines",
-                marker=dict(size=5, opacity=0.5, color=snapshot_color),
+                marker=dict(size=6, opacity=0.5, color=snapshot_color),
                 line=dict(width=1, color=snapshot_color),
                 legendgroup=str(s),
                 legendgrouptitle_text=str(s),
@@ -71,13 +79,9 @@ def create_visuals(df):
     fig.add_traces(traces)
 
     fig.update_layout(
-        scene=dict(
-            xaxis=dict(backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"),
-            yaxis=dict(backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"),
-            zaxis=dict(
-                nticks=6, backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"
-            ),
-        )
+        # scene_camera=dict(eye=dict(x=0.0, y=0.0, z=2.5)),
+        template="plotly_dark",
+        scene=dict(zaxis=dict(nticks=6), yaxis=dict(autorange="reversed")),
     )
 
     # returns the plotly figure created from snapshots
