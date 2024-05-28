@@ -77,12 +77,14 @@ def create_visuals(df):
     # add main path traces
     fig.add_traces(traces)
 
+    camera = dict(up=dict(x=0.0, y=0.0, z=1), eye=dict(x=0.0, y=0.1, z=2))
     fig.update_layout(
         # scene_camera=dict(eye=dict(x=0.0, y=0.0, z=2.5)),
         template="plotly_dark",
+        scene_camera=camera,
         scene=dict(
-            xaxis=dict(nticks=8),
-            yaxis=dict(nticks=8, autorange="reversed"),
+            xaxis=dict(nticks=6, autorange="reversed"),
+            yaxis=dict(nticks=6),
             zaxis=dict(nticks=4),
         ),
     )
