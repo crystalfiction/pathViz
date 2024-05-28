@@ -129,7 +129,6 @@ def test_logs():
 class Modes(str, Enum):
     load = "load"
     viz = "viz"
-    query = "query"
     clear = "clear"
 
 
