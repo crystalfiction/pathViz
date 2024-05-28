@@ -57,8 +57,6 @@ def create_visuals(df):
         for i, p in enumerate(pid_uniques):
             # filter df for current path
             vectors = filtered[filtered["path_id"] == p]
-            # sort vectors by path_goal
-            vectors = vectors.sort_values(by=["path_goal"])
             # get common goal for path
             goal = vectors["path_goal"].mode()[0]
             trace = go.Scatter3d(
@@ -81,7 +79,11 @@ def create_visuals(df):
     fig.update_layout(
         # scene_camera=dict(eye=dict(x=0.0, y=0.0, z=2.5)),
         template="plotly_dark",
-        scene=dict(zaxis=dict(nticks=6), yaxis=dict(autorange="reversed")),
+        scene=dict(
+            xaxis=dict(nticks=8),
+            yaxis=dict(nticks=8, autorange="reversed"),
+            zaxis=dict(nticks=4),
+        ),
     )
 
     # returns the plotly figure created from snapshots
