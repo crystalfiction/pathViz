@@ -11,9 +11,10 @@ import pandas as pd
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from dotenv import load_dotenv
+from typing_extensions import Annotated
 
 from parse import parse_logs
-from visualize import make_visuals
+from visualize import visualize
 
 
 load_dotenv()
@@ -99,16 +100,11 @@ def save_data(mode, data):
             # write figure to image file
             content = data
             content.write_image(OUTPUT_DIR + mode + fileName + ".png")
-        elif mode == "stats":
-            content = pd.merge(data[0], data[1], on=data[0].index)
-            content = content.rename(columns={"key_0": "snapshot"})
-            content = content.set_index("snapshot")
-            content.to_csv(OUTPUT_DIR + mode + fileName + ".csv")
     else:
         return print("File already exists...")
 
 
-def test_logs():
+def clean_logs():
     logs = os.listdir(DATA_DIR)
     # test logs...
     for l in logs:
@@ -132,7 +128,11 @@ class Modes(str, Enum):
     clear = "clear"
 
 
-def main(mode: Modes):
+def main(
+    mode: Modes,
+    s: Annotated[bool, typer.Option(help="Save the visual once created.")] = False,
+    g: Annotated[bool, typer.Option(help="Group visual by path goal")] = False,
+):
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
@@ -144,18 +144,18 @@ def main(mode: Modes):
     if mode == "load":
         # if load mode...
         # cleanup any empty logs
-        test_logs()
+        clean_logs()
 
         # parse logs
         parse_logs(DATA_DIR)
 
     elif mode == "viz":
+        # TODO: implement '-g' flag for grouping by goal
         # if viz mode
-        fig = make_visuals()
+        fig = visualize(g)
 
         # if save flagged
-        doSave = typer.prompt("Export to file? [y/n]")
-        if doSave.lower() != "n":
+        if s:
             save_data(mode, fig)
 
         # show fig regardless
