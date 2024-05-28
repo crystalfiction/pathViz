@@ -86,6 +86,9 @@ def make_snapshots(logs):
         # set final_df to new_logs
         final_df = pd.concat(new_logs).reset_index(drop=True)
 
+    # ensure dtypes
+    final_df["snapshot"] = final_df["snapshot"].astype("str")
+
     # create snapshot files
     final_df.to_csv("snapshots.csv")
     final_df.to_json("snapshots.json", orient="records")
