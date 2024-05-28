@@ -7,8 +7,11 @@ import itertools
 import math
 from sklearn.cluster import KMeans
 from parse import parse_keys
+import random
 
 col_pal = px.colors.qualitative.Plotly
+seq_col_pal = px.colors.sequential.Viridis
+seq_col_pal_r = px.colors.sequential.Viridis_r
 col_pal_iter = itertools.cycle(col_pal)
 
 
@@ -29,7 +32,7 @@ def get_kmeans(data):
     return cluster
 
 
-def create_visuals(df):
+def create_visuals(df, g):
     print("Creating visuals...")
 
     GOAL_KEY = parse_keys()
@@ -37,25 +40,35 @@ def create_visuals(df):
     # define plotly fig
     fig = go.Figure()
 
+    # generate kmeans for plotting
+    # TODO: implement clustering option in visuals
+    kmeans = get_kmeans(df)
+
     # get unique snapshots
     uniques = df["snapshot"].unique()
 
-    # generate kmeans for plotting
-    kmeans = get_kmeans(df)
+    # get unique path_goals
+    unique_goals = df["path_goal"].unique()
+    goal_colors = {}
+    for i, u_goal in enumerate(unique_goals):
+        if i < 10:
+            goal_colors[u_goal] = col_pal[i]
+        else:
+            goal_colors[u_goal] = col_pal[i - 10]
 
     # for each snapshot
     traces = []
     for s in uniques:
-        snapshot_color = next(col_pal_iter)
+        trace_color = next(col_pal_iter)
 
-        # filter df by current snapshot
+        # filter df by current grouping
         filtered = df[df["snapshot"] == s]
 
-        # get unique path_id's from current snapshot
+        # get unique path_id's from current grouping
         pid_uniques = filtered["path_id"].unique()
 
         # for each unique path_id
-        for i, p in enumerate(pid_uniques):
+        for p in pid_uniques:
             # filter df for current path
             vectors = filtered[filtered["path_id"] == p]
             # get common goal for path
@@ -66,8 +79,12 @@ def create_visuals(df):
                 z=vectors["z"],
                 name=str(GOAL_KEY[goal]),
                 mode="markers+lines",
-                marker=dict(size=6, opacity=0.5, color=snapshot_color),
-                line=dict(width=1, color=snapshot_color),
+                marker=dict(
+                    size=6,
+                    opacity=0.5,
+                    color=trace_color if not g else goal_colors[goal],
+                ),
+                line=dict(width=1, color=trace_color if not g else goal_colors[goal]),
                 legendgroup=str(s),
                 legendgrouptitle_text=str(s),
             )
@@ -93,7 +110,7 @@ def create_visuals(df):
     return fig
 
 
-def make_visuals():
+def visualize(g):
     # make sure snapshots exist
     if os.path.exists("snapshots.csv"):
 
@@ -101,7 +118,7 @@ def make_visuals():
         snapshots = pd.read_csv("snapshots.csv", index_col=False)
 
         # create visuals from snapshots
-        fig = create_visuals(snapshots)
+        fig = create_visuals(snapshots, g)
 
         # return the plotly fig
         print("Visualizing data...")
