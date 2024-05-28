@@ -1,2 +1,6 @@
 .venv/
 __pycache__
+data/*
+output/*
+snapshots.*
+scriptLog.txt
