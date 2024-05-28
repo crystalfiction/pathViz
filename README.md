@@ -11,6 +11,22 @@ The overall structure of pathViz consists of two parts:
    1. logs dwarf paths once every ingame week (currently not configurable)
 2. `pathViz/pathViz.py` - a simple, python command-line module for interacting with pathViz
 
+## Screenshots
+
+Here are a few screenshots demonstrating usage, using a new fort I started as the subject. The screenshots were logged over the first game year...
+
+![topDown_overlaid](images/topDown_overlaid.png)
+A top-down view, roughly overlaid with the game screen for reference.
+
+![newfort_y1](images/newFort_y1.png)
+The top down view with the visual isolated.
+
+![newFort_y1_3d](images/newFort_y1_3d.png)
+A skewed, 3D angle for scale.
+
+![newFort_y1_zoomed](images/newFort_y1_zoomed.png)
+The central structure, zoomed in. We can see some high-traffic areas beginning to form (the ovular structure at the top is my trade floor), as well as my services and workshop floors towards the lower z-levels.
+
 ## Setup
 
 <b>Requirements:</b>
@@ -46,30 +62,16 @@ Loads data existing in the `pathViz/{DATA_DIR}/` sub-directory, then creates a c
 
 - `DATA_DIR`: environment variable representing the relative path to the pathViz data directory; set from the `.env` file
 - Logs the parsed scripts to `scriptLog.txt`, which acts as a simple memory cache
+<br><br>
 
 <b>viz</b> - `python pathViz.py viz`
 
 Reads data existing in the `pathViz/{DATA_DIR}/` sub-directory, then generates a `Plotly` visual from the loaded path data.
 
 - Once run, will prompt asking whether to export the visual to the set `OUTPUT_DIR` directory, set in the `.env` file.
+<br><br>
 
 <b>clear</b> - `python pathViz.py clear`
 
 Clears data loaded to the app, preserving the log files in the set `DATA_DIR` directory. Logs are intentionally left persistent for more control over user-defined path data organization.
 - *This means you will <b>manually</b> have to relocate the log files if you don't want them to be considered in the next `load` call.*
-
-## Screenshots
-
-Here are a few screenshots demonstrating usage, using a new fort I started as the subject. The screenshots were logged over the first game year...
-
-![topDown_overlaid](images/topDown_overlaid.png)
-A top-down view, roughly overlaid with the game screen for reference.
-
-![newfort_y1](images/newFort_y1.png)
-The top down view with the visual isolated.
-
-![newFort_y1_3d](images/newFort_y1_3d.png)
-A skewed, 3D angle for scale.
-
-![newFort_y1_zoomed](images/newFort_y1_zoomed.png)
-The central structure, zoomed in. We can see some high-traffic areas beginning to form (the ovular structure at the top is my trade floor), as well as my services and workshop floors towards the lower z-levels.
