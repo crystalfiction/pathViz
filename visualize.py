@@ -70,7 +70,15 @@ def create_visuals(df):
     # add main path traces
     fig.add_traces(traces)
 
-    fig.update_layout(scene=dict(zaxis=dict(nticks=6)))
+    fig.update_layout(
+        scene=dict(
+            xaxis=dict(backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"),
+            yaxis=dict(backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"),
+            zaxis=dict(
+                nticks=6, backgroundcolor="rgba(0,0,0,0)", gridcolor="rgba(0,0,0,0.3)"
+            ),
+        )
+    )
 
     # returns the plotly figure created from snapshots
     return fig

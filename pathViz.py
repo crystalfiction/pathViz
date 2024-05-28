@@ -115,6 +115,13 @@ def save_data(mode, data):
 
 
 def main():
+    # ensure directories exist
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
+
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+
     # create argparser
     parser = argparse.ArgumentParser(
         description="pathViz generates statistics and visuals of dwarf paths based on vector data",
@@ -152,11 +159,12 @@ def main():
         # if stats mode
         stats = generate_stats()
 
-        if args.s:
-            save_data(args.mode, stats)
+        if stats is not None:
+            if args.s:
+                save_data(args.mode, stats)
 
-        for s in stats:
-            print(s)
+            for s in stats:
+                print(s)
 
     elif args.mode == "clear":
         # if clear mode

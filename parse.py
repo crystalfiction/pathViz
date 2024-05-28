@@ -14,6 +14,10 @@ def read_logs(dir):
 
     # get the logNames
     logNames = os.listdir(dir)
+    # if no logs, break
+    if len(logNames) == 0:
+        return None
+
     # dict of logs
     logData = {}
 
@@ -114,7 +118,6 @@ def parse_logs(dir):
     logData = read_logs(dir)
     if logData is not None:
         # snapshot logData to 'parsed' dir
-        print("New logs found...")
         make_snapshots(logData)
     else:
         print("No new logs found.")
