@@ -6,10 +6,11 @@ import plotly.graph_objects as go
 import itertools
 import math
 from sklearn.cluster import KMeans
-from parse_goals import parse_keys
+from parse import parse_keys
 
 col_pal = px.colors.qualitative.Plotly
 col_pal_iter = itertools.cycle(col_pal)
+
 
 GOAL_KEY = {}
 

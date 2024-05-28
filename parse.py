@@ -6,6 +6,10 @@ import os
 import pandas as pd
 import numpy as np
 import math
+import xmltodict
+
+
+GOAL_KEY = {}
 
 
 def read_logs(dir):
@@ -56,20 +60,6 @@ def read_logs(dir):
         return None
 
 
-def test_log(log):
-    # check if log has already been read
-    parsed = False
-    with open("scriptLog.txt", "r") as f:
-        lines = f.readlines()
-        for row in lines:
-            if row.find(log) != -1:
-                # log name was found
-                parsed = True
-
-    # returns True if log exists in scriptLog, else False
-    return parsed
-
-
 def make_snapshots(logs):
     print("Making snapshots...")
 
@@ -101,14 +91,36 @@ def make_snapshots(logs):
     final_df.to_json("snapshots.json", orient="records")
 
 
-def normalize_cols(df):
-    numerics = ["x", "y", "z"]
-    for n in numerics:
-        # normalization
-        df[n] = (df[n] - df[n].min()) / (df[n].max() - df[n].min())
+def test_log(log):
+    # check if log has already been read
+    parsed = False
+    with open("scriptLog.txt", "r") as f:
+        lines = f.readlines()
+        for row in lines:
+            if row.find(log) != -1:
+                # log name was found
+                parsed = True
 
-    # returns normalized dataframe
-    return df
+    # returns True if log exists in scriptLog, else False
+    return parsed
+
+
+def parse_keys():
+    # parse the xml file to dict
+    xml = None
+    with open("goals_key.xml", "r", encoding="utf8") as f:
+        content = f.read()
+        xml = xmltodict.parse(content)
+
+    key_dict = xml["enum-type"]["enum-item"]
+    for i, k in enumerate(key_dict):
+        # convert list to '-1' based
+        i = i - 1
+
+        # add to GOAL_KEY dict
+        GOAL_KEY[i] = k["@name"]
+
+    return GOAL_KEY
 
 
 def parse_logs(dir):

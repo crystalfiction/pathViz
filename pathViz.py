@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 
 from parse import parse_logs
 from visualize import make_visuals
-from stats import generate_stats
+from query import query
 
 
 load_dotenv()
@@ -136,6 +136,7 @@ def test_logs():
 class Modes(str, Enum):
     load = "load"
     viz = "viz"
+    query = "query"
     clear = "clear"
 
 
@@ -168,6 +169,12 @@ def main(mode: Modes):
         # show fig regardless
         if fig is not None:
             fig.show()
+        else:
+            return print("No data found... please 'import' first.")
+
+    elif mode == "query":
+        if os.path.exists("snapshots.csv"):
+            query()
         else:
             return print("No data found... please 'import' first.")
 
