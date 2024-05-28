@@ -8,7 +8,7 @@ import logging
 import math
 import statistics
 import time
-import argparse
+import typer
 
 import pandas as pd
 import numpy as np
@@ -131,7 +131,7 @@ def test_logs():
             os.remove(logPath)
 
 
-def main():
+def main(mode: str, save: bool = False):
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
@@ -139,21 +139,8 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
 
-    # create argparser
-    parser = argparse.ArgumentParser(
-        description="pathViz generates statistics and visuals of dwarf paths based on vector data",
-        epilog="",
-    )
-
-    # add options
-    parser.add_argument("mode", type=str)
-    parser.add_argument("-s", "--s", action=argparse.BooleanOptionalAction)
-
-    # parse args
-    args = parser.parse_args()
-
     # test args
-    if args.mode == "import":
+    if mode == "import":
         # if import mode...
         # cleanup any empty logs
         test_logs()
@@ -161,13 +148,13 @@ def main():
         # parse logs
         parse_logs(DATA_DIR)
 
-    elif args.mode == "viz":
+    elif mode == "viz":
         # if viz mode
         fig = make_visuals()
 
-        # if -s(save) flagged
-        if args.s:
-            save_data(args.mode, fig)
+        # if save flagged
+        if save is not False:
+            save_data(mode, fig)
 
         # show fig regardless
         if fig is not None:
@@ -175,18 +162,18 @@ def main():
         else:
             return print("No data found... please 'import' first.")
 
-    elif args.mode == "stats":
+    elif mode == "stats":
         # if stats mode
         stats = generate_stats()
 
         if stats is not None:
-            if args.s:
-                save_data(args.mode, stats)
+            if save is not False:
+                save_data(mode, stats)
 
             for s in stats:
                 print(s)
 
-    elif args.mode == "clear":
+    elif mode == "clear":
         # if clear mode
         clear_cache()
 
@@ -195,4 +182,4 @@ if __name__ == "__main__":
     if DATA_DIR is None or OUTPUT_DIR is None:
         print("Please specify your data & output directories in the .env file.")
     else:
-        main()
+        typer.run(main)
