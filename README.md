@@ -39,9 +39,9 @@ The central structure, zoomed in. We can see some high-traffic areas beginning t
 3. Open your terminal and `cd` into `pathViz/`, then run `pipenv install` to install pathViz's package dependencies (this may take a few minutes)
    1. If you have issues with `pipenv`, they have detailed documentation around common troubleshooting
 4. Once packages are installed, run `pipenv shell` to activate the virtual environment
-5. Optional:
-   1. Locate the `pathViz/.env` file and open it. This file tells pathViz which directories to use when parsing and outputing log data.
-      1. By default, both `DATA_DIR` (where the dfhack script logs path data to) and `OUTPUT_DIR` (where `pathViz` logs saved data) are set to `data/` and `output/`, respectively, but feel free to set them wherever, as long as they are in the `pathViz/` directory.
+5. Locate the `pathViz/.env` file and open it. This file tells pathViz which directories to use when parsing and outputing log data.
+   1. By default, both `DATA_DIR` (where the dfhack script logs path data to) and `OUTPUT_DIR` (where `pathViz` logs saved data) are set to `data/` and `output/`, respectively, but feel free to set them wherever, as long as they are in the `pathViz/` directory.
+   2. `pathViz` will automatically create these folders with the provided names when necessary.
 6. Locate the `logPaths.lua` file and open it. Locate the `filePrefix` variable at the top, and change it to `pathViz`'s data directory
    1. if `.env` was left untouched, this will be the system path to the `pathViz/` directory, or in my case `C:\\Users\\rocke\\Documents\\pathViz\\data\\` (make sure to escape your backslashes, unless you know what you're doing)
 7. Move the `logPaths.lua` file to the `hack/scripts/` sub-directory in your Dwarf Fortress game folder (`Dwarf Fortress/hack/scripts/`)
