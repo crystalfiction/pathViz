@@ -3,6 +3,5 @@ __pycache__
 Pipfile.lock
 data/*
 output/*
-images/
 snapshots.*
 scriptLog.txt
