@@ -6,8 +6,10 @@ import plotly.graph_objects as go
 import itertools
 import math
 from sklearn.cluster import KMeans
-from parse import parse_keys
 import typer
+
+from parse import parse_keys
+from utils import normalize_list
 
 col_pal = px.colors.qualitative.Plotly
 seq_col_pal = px.colors.sequential.Viridis
@@ -29,9 +31,10 @@ def get_kmeans(data):
     kmeans = KMeans(n_clusters=1, n_init="auto")
     data_k = kmeans.fit(data_prep)
     cluster = data_k.cluster_centers_
+    inertia = data_k.inertia_
 
     # returns the cluster coordinates from snapshots kmeans
-    return cluster
+    return cluster, inertia
 
 
 def create_visuals(df, g, c, limit, orient):
@@ -47,11 +50,12 @@ def create_visuals(df, g, c, limit, orient):
 
     # of --limit passed
     if limit > 0:
+        # TODO: account for limit=1
         # if orient top
         if orient == "top":
             # slice the first n=limit snapshots
             uniques = uniques[:limit]
-        else:
+        elif orient == "btm":
             # otherwise, orient bottom (default)
             uniques = uniques[-limit : len(uniques)]
 
@@ -66,8 +70,9 @@ def create_visuals(df, g, c, limit, orient):
         else:
             goal_colors[u_goal] = col_pal[i - 10]
 
-    # for each snapshot
+    # final traces list
     traces = []
+    # for each snapshot
     for s in uniques:
         # cycle through trace_color iterator
         trace_color = next(col_pal_iter)
@@ -81,15 +86,22 @@ def create_visuals(df, g, c, limit, orient):
         # if 'c' cluster flag passed
         if c:
             # get kmeans for snapshot
-            kmeans = get_kmeans(filtered)
+            cluster, inertia = get_kmeans(filtered)
+            kmeans_x = cluster[0, 0]
+            kmeans_y = cluster[0, 1]
+            kmeans_z = cluster[0, 2]
             # create cluster trace
             trace = go.Scatter3d(
-                x=[kmeans[0, 0]],
-                y=[kmeans[0, 1]],
-                z=[kmeans[0, 2]],
+                x=[kmeans_x],
+                y=[kmeans_y],
+                z=[kmeans_z],
                 name=str(s) + "_cluster",
                 mode="markers",
-                marker=dict(size=12, opacity=0.8, color=trace_color),
+                marker=dict(
+                    size=12,
+                    opacity=1,
+                    color=trace_color,
+                ),
                 legendgroup=str(s),
                 legendgrouptitle_text=str(s),
             )
@@ -142,7 +154,9 @@ def visualize(g, c, limit, orient):
     if os.path.exists("snapshots.csv"):
 
         # read snapshots from snapshots.csv
-        snapshots = pd.read_csv("snapshots.csv", index_col=False)
+        snapshots = pd.read_csv("snapshots.csv", index_col=False).drop(
+            columns=["Unnamed: 0"]
+        )
 
         # create visuals from snapshots
         fig = create_visuals(snapshots, g, c, limit, orient)

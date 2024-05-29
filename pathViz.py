@@ -132,7 +132,9 @@ def main(
     mode: Modes,
     s: Annotated[bool, typer.Option(help="Save the visual once created.")] = False,
     g: Annotated[bool, typer.Option(help="Group visual by path goal.")] = False,
-    c: Annotated[bool, typer.Option(help="Generate KMeans clusters.")] = False,
+    c: Annotated[
+        bool, typer.Option(help="Generate KMeans clusters per snapshot.")
+    ] = False,
     limit: Annotated[
         int, typer.Option(help="Limit the number of snapshots visualized.")
     ] = 0,
