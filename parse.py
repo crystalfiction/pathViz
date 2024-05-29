@@ -123,6 +123,11 @@ def make_snapshots(logs: dict):
     # ensure dtypes
     final_df["snapshot"] = final_df["snapshot"].astype("str")
 
+    # prefix the path_ids with snapshot_id
+    final_df["path_id"] = (
+        final_df["snapshot"].astype("str") + "_" + final_df["path_id"].astype("str")
+    )
+
     # create snapshot files
     final_df.to_csv("snapshots.csv")
     final_df.to_json("snapshots.json", orient="records")
