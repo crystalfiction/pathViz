@@ -131,7 +131,14 @@ class Modes(str, Enum):
 def main(
     mode: Modes,
     s: Annotated[bool, typer.Option(help="Save the visual once created.")] = False,
-    g: Annotated[bool, typer.Option(help="Group visual by path goal")] = False,
+    g: Annotated[bool, typer.Option(help="Group visual by path goal.")] = False,
+    c: Annotated[bool, typer.Option(help="Generate KMeans clusters.")] = False,
+    limit: Annotated[
+        int, typer.Option(help="Limit the number of snapshots visualized.")
+    ] = 0,
+    orient: Annotated[
+        str, typer.Option(help="How to orient the snapshot limit ['top'|'btm']")
+    ] = "btm",
 ):
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
@@ -150,9 +157,8 @@ def main(
         parse_logs(DATA_DIR)
 
     elif mode == "viz":
-        # TODO: implement '-g' flag for grouping by goal
         # if viz mode
-        fig = visualize(g)
+        fig = visualize(g, c, limit, orient)
 
         # if save flagged
         if s:
