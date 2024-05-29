@@ -112,6 +112,13 @@ python pathViz.py clear
 - Either back them up to a new folder, or simply delete them
 
 
-## Development
+## Screenshots
 
-Read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+![newFort_y1](images/newFort_y1.png)
+*A top-down perspective*
+
+![newFort_y1_3d](images/newFort_y1_3d.png)
+*A 3D perspective*
+
+![newFort_y1_zoomed](images/newFort_y1_zoomed.png)
+*A zoomed-in, 3D perspective. We can see overall fort structure beginning to form.*
