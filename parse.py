@@ -161,6 +161,3 @@ def parse_logs(dir: str):
     if logData is not None:
         # make snapshots of the logData
         make_snapshots(logData)
-    else:
-        # no new logs exist
-        print("No new logs found.")

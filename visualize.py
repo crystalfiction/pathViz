@@ -8,7 +8,7 @@ import itertools
 import math
 from sklearn.cluster import KMeans
 
-from utils import parse_keys, normalize_list
+from utils import parse_keys, normalize_list, get_kmeans
 
 col_pal = px.colors.qualitative.Plotly
 seq_col_pal = px.colors.sequential.Viridis
@@ -17,29 +17,6 @@ col_pal_iter = itertools.cycle(col_pal)
 
 
 GOAL_KEY = {}
-
-
-def get_kmeans(snapshot: DataFrame):
-    """
-    Calculates KMeans clustering for the passed snapshot
-
-    Returns cluster center coordinates and inertia
-    """
-
-    # subset numericals from the snapshot
-    snapshot_prep = snapshot[["x", "y", "z"]]
-
-    # instantiate KMeans model
-    kmeans = KMeans(n_clusters=1, n_init="auto")
-    # fit snapshot to model
-    snapshot_k = kmeans.fit(snapshot_prep)
-    # get the cluster centers
-    cluster_center = snapshot_k.cluster_centers_
-    # get the inertia
-    inertia = snapshot_k.inertia_
-
-    # return the snapshot KMeans data
-    return cluster_center, inertia
 
 
 def create_visuals(df: DataFrame, g: bool, c: bool, limit: int, orient: str):

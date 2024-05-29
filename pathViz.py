@@ -33,13 +33,16 @@ def clear_cache():
         # close the log and reset contents
         log.close()
 
+    # print update
+    print("Script cache cleared...")
+
     # remove snapshots
     try:
         os.remove("snapshots.csv")
         os.remove("snapshots.json")
-        print("Cleared cache.")
+        print("Removed snapshots files...")
     except:
-        print("No snapshots found... please run 'import' first.")
+        print("No snapshots found...")
 
 
 def save_data(mode: str, data: Figure):
@@ -144,6 +147,9 @@ def main(
         # then parse the logs in DATA_DIR
         parse_logs(DATA_DIR)
 
+        # print update
+        print("Done.")
+
     elif mode == "viz":
         # if viz mode...
 
@@ -170,6 +176,9 @@ def main(
 
         # clear the cache
         clear_cache()
+
+        # print update
+        print("Done.")
 
 
 if __name__ == "__main__":
