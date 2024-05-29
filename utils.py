@@ -4,9 +4,33 @@ import pandas as pd
 from pandas import DataFrame
 import numpy as np
 from sklearn.cluster import KMeans
+from sklearn.neighbors import KernelDensity
 
 
 GOAL_KEY = {}
+
+
+def get_density(df: DataFrame):
+    """"""
+    # remove non-numerical cols
+    X = df[["x", "y", "z"]]
+    X_features = df[["path_id", "path_goal", "snapshot"]]
+
+    # fit X to the model
+    kde = KernelDensity(kernel="gaussian", bandwidth=1)
+    kde.fit(X)
+    density = kde.score_samples(X)
+    density = [round(i) for i in density]
+    normalized = normalize_data(density)
+
+    # merge the data/features after fitting
+    processed = X.merge(X_features, on=X.index, sort=False).drop(columns=["key_0"])
+
+    # add distances to df['n_dist'] col
+    processed["n_density"] = pd.Series(normalized).astype("float")
+
+    # return the processed df
+    return processed
 
 
 def parse_keys():
@@ -55,7 +79,5 @@ def get_kmeans(snapshot: DataFrame):
     return cluster_center, inertia
 
 
-def normalize_list(list):
-    # normalize list between 0:1
-    norm = [float(i) / sum(list) for i in list]
-    return norm
+def normalize_data(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
