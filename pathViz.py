@@ -115,6 +115,9 @@ def main(
     c: Annotated[
         bool, typer.Option(help="Generate KMeans clusters per snapshot.")
     ] = False,
+    heat: Annotated[
+        bool, typer.Option(help="Generate a time-dependent heatmap.")
+    ] = False,
     limit: Annotated[
         int, typer.Option(help="Limit the number of snapshots visualized.")
     ] = 0,
@@ -155,7 +158,7 @@ def main(
 
         # call visualize, pass CLI options
         # and save Plotly figure to fig
-        fig = visualize(g, c, limit, orient)
+        fig = visualize(g, c, heat, limit, orient)
 
         # if save option passed...
         if s:
