@@ -7,7 +7,7 @@ import itertools
 import math
 from sklearn.cluster import KMeans
 from parse import parse_keys
-import random
+import typer
 
 col_pal = px.colors.qualitative.Plotly
 seq_col_pal = px.colors.sequential.Viridis
@@ -19,7 +19,9 @@ GOAL_KEY = {}
 
 
 def get_kmeans(data):
-    print("Evaluating snapshots...")
+    """
+    Returns the cluster coordinates from snapshots kmeans
+    """
 
     # prepare data
     data_prep = data[["x", "y", "z"]]
@@ -32,7 +34,7 @@ def get_kmeans(data):
     return cluster
 
 
-def create_visuals(df, g):
+def create_visuals(df, g, c, limit, orient):
     print("Creating visuals...")
 
     GOAL_KEY = parse_keys()
@@ -40,15 +42,23 @@ def create_visuals(df, g):
     # define plotly fig
     fig = go.Figure()
 
-    # generate kmeans for plotting
-    # TODO: implement clustering option in visuals
-    kmeans = get_kmeans(df)
-
     # get unique snapshots
     uniques = df["snapshot"].unique()
 
+    # of --limit passed
+    if limit > 0:
+        # if orient top
+        if orient == "top":
+            # slice the first n=limit snapshots
+            uniques = uniques[:limit]
+        else:
+            # otherwise, orient bottom (default)
+            uniques = uniques[-limit : len(uniques)]
+
     # get unique path_goals
     unique_goals = df["path_goal"].unique()
+    # generate goal colors
+    # plotly color palettes aren't long enough
     goal_colors = {}
     for i, u_goal in enumerate(unique_goals):
         if i < 10:
@@ -59,6 +69,7 @@ def create_visuals(df, g):
     # for each snapshot
     traces = []
     for s in uniques:
+        # cycle through trace_color iterator
         trace_color = next(col_pal_iter)
 
         # filter df by current grouping
@@ -66,6 +77,23 @@ def create_visuals(df, g):
 
         # get unique path_id's from current grouping
         pid_uniques = filtered["path_id"].unique()
+
+        # if 'c' cluster flag passed
+        if c:
+            # get kmeans for snapshot
+            kmeans = get_kmeans(filtered)
+            # create cluster trace
+            trace = go.Scatter3d(
+                x=[kmeans[0, 0]],
+                y=[kmeans[0, 1]],
+                z=[kmeans[0, 2]],
+                name=str(s) + "_cluster",
+                mode="markers",
+                marker=dict(size=12, opacity=0.8, color=trace_color),
+                legendgroup=str(s),
+                legendgrouptitle_text=str(s),
+            )
+            traces.append(trace)
 
         # for each unique path_id
         for p in pid_uniques:
@@ -88,7 +116,6 @@ def create_visuals(df, g):
                 legendgroup=str(s),
                 legendgrouptitle_text=str(s),
             )
-
             traces.append(trace)
 
     # add main path traces
@@ -110,7 +137,7 @@ def create_visuals(df, g):
     return fig
 
 
-def visualize(g):
+def visualize(g, c, limit, orient):
     # make sure snapshots exist
     if os.path.exists("snapshots.csv"):
 
@@ -118,7 +145,7 @@ def visualize(g):
         snapshots = pd.read_csv("snapshots.csv", index_col=False)
 
         # create visuals from snapshots
-        fig = create_visuals(snapshots, g)
+        fig = create_visuals(snapshots, g, c, limit, orient)
 
         # return the plotly fig
         print("Visualizing data...")
