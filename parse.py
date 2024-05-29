@@ -4,86 +4,120 @@
 
 import os
 import pandas as pd
-import numpy as np
+from pandas import DataFrame
 import math
-import xmltodict
 
 
 GOAL_KEY = {}
 
 
-def read_logs(dir):
-    # define scriptLog
+def read_logs(dir: str):
+    """
+    Reads logs in the passed dir
+
+    Returns dict where {key: snapshotName, value: snapshotDataFrame
+    """
+
+    # list to append new scriptLog entries
     scriptLog = []
 
-    # get the logNames
+    # read logNames from passed dir
     logNames = os.listdir(dir)
-    # if no logs, break
+    # if no logs exist...
     if len(logNames) == 0:
+        # return None before processing
         return None
 
     # dict of logs
+    # key: snapshotName, value: logDf
     logData = {}
 
     # if logFiles exist...
     if len(logNames) > 0:
         # for each log...
         for log in logNames:
+            # test if log as already been parsed...
             if not test_log(log):
-                # add entry to logData dict as DataFrame
+                # if not...
+
+                # remove the file suffix
                 snapshotName = log.replace(".txt", "")
+                # read the log file to logDf as DataFrame
                 logDf = pd.read_csv(dir + log, header=None, index_col=False)
+                # format logdf
                 logDf = logDf.rename(
                     columns={0: "path_id", 1: "path_goal", 2: "x", 3: "y", 4: "z"}
                 )
+                # replace snapshot column with formatted name snapshotName
                 logDf["snapshot"] = snapshotName
+
+                # add entry to logData dict with...
+                # key: snapshotName, value: logDf
                 logData[snapshotName] = logDf
+
+                # floor the 'z' values for more uniformity in plotting
                 logDf["z"] = logDf["z"].apply(math.floor)
 
-                # push to scriptLog to document updates
+                # append the un-formatted log file name to scriptLog
                 scriptLog.append(log)
 
+    # print the number of logs currently being processed
     print(str(len(scriptLog)) + " new logs found...")
 
     # if scriptLog is not empty
+    # i.e. if new logs were found
     if len(scriptLog) > 0:
-        # loop through scriptLog...
+        # open scriptLog.txt...
         with open("scriptLog.txt", "a") as f:
+            # print user update
             print("Writing data file names to cache...")
+            # for each log name, append to content of scriptLog.txt
             for logName in scriptLog:
                 f.write(logName + "\n")
 
-        # if new scripts, returns dict of logData DF
+        # returns logData DataFrame
         return logData
     else:
-        # if no new scripts, returns None
+        # if no new logs, return None
         return None
 
 
-def make_snapshots(logs):
+def make_snapshots(logs: dict):
+    """
+    Accepts formatted logs from read_logs
+    and creates/updates snapshots.csv & snapshots.json
+    """
     print("Making snapshots...")
 
+    # list of dataframes combine into final_df
     new_logs = []
-    # make it from passed logs
-    for logName in logs.keys():
-        new_log = logs[logName].reset_index(drop=True)
+    # for each snapshot in the logs dict
+    for snapshot in logs.keys():
+        # get the snapshot's dataframe
+        new_log = logs[snapshot].reset_index(drop=True)
+        # then append to new_logs
         new_logs.append(new_log)
 
-    # flatten new_logs to logs_df
+    # if more than one log was passed...
     if len(new_logs) > 1:
+        # combine all into one DataFrame
         logs_df = pd.concat(new_logs)
     else:
+        # else convert to single DataFrame
         logs_df = new_logs[0]
 
-    # if snapshots csv exists
+    # to test whether snapshots file exists
     existing = None
+    # to be used as the returned DataFrame
     final_df = None
+    # if snapshots csv already exists...
     if os.path.exists("snapshots.csv"):
-        # concat with existing
+        # combine new logs with existing
         existing = pd.read_csv("snapshots.csv").drop(columns=["Unnamed: 0"])
+        # then set final_df to combined frame
         final_df = pd.concat([existing, logs_df]).reset_index(drop=True)
     else:
-        # set final_df to new_logs
+        # else set final_df as new_logs
         final_df = pd.concat(new_logs).reset_index(drop=True)
 
     # ensure dtypes
@@ -94,7 +128,13 @@ def make_snapshots(logs):
     final_df.to_json("snapshots.json", orient="records")
 
 
-def test_log(log):
+def test_log(log: str):
+    """
+    Accepts a log, where log = the name of a
+    log in data/, and tests if exists in scriptLog.txt
+
+    Returns True if already parsed, else False
+    """
     # check if log has already been read
     parsed = False
     with open("scriptLog.txt", "r") as f:
@@ -108,31 +148,19 @@ def test_log(log):
     return parsed
 
 
-def parse_keys():
-    # parse the xml file to dict
-    xml = None
-    with open("goals_key.xml", "r", encoding="utf8") as f:
-        content = f.read()
-        xml = xmltodict.parse(content)
-
-    key_dict = xml["enum-type"]["enum-item"]
-    for i, k in enumerate(key_dict):
-        # convert list to '-1' based
-        i = i - 1
-
-        # add to GOAL_KEY dict
-        GOAL_KEY[i] = k["@name"]
-
-    return GOAL_KEY
-
-
-def parse_logs(dir):
+def parse_logs(dir: str):
+    """
+    Parse logs in the passed dir,
+    then makes aggregated snapshots files.
+    """
     print("Parsing logs...")
 
     # read the logs
     logData = read_logs(dir)
+    # if new logs exist...
     if logData is not None:
-        # snapshot logData to 'parsed' dir
+        # make snapshots of the logData
         make_snapshots(logData)
     else:
+        # no new logs exist
         print("No new logs found.")

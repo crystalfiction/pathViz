@@ -8,62 +8,27 @@ import typer
 from enum import Enum
 
 import pandas as pd
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from dotenv import load_dotenv
 from typing_extensions import Annotated
+from plotly.graph_objects import Figure
 
 from parse import parse_logs
 from visualize import visualize
 
-
+# load env vars
 load_dotenv()
 
+# save env vars
 DATA_DIR = os.getenv("DATA_DIR")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 
 
-class OnWatch:
-    """
-    Starts monitoring changes @ data_dir
-    """
-
-    watch_dir = DATA_DIR
-
-    def __init__(self):
-        self.observer = Observer()
-
-    def run(self):
-        event_handler = Handler()
-        self.observer.schedule(event_handler, self.watch_dir)
-        self.observer.start()
-        try:
-            while True:
-                time.sleep(5)
-        except KeyboardInterrupt:
-            self.observer.stop()
-            print("Stopped monitoring data changes.")
-
-        self.observer.join()
-
-
-class Handler(FileSystemEventHandler):
-    """
-    Checks for FileSystem events
-    """
-
-    @staticmethod
-    def on_any_event(event):
-        if event.is_directory:
-            return None
-        elif event.event_type == "created":
-            pass
-        elif event.event_type == "modified":
-            pass
-
-
 def clear_cache():
+    """
+    Wipes the contents of logScript.txt
+    and removes existing snapshots.csv & snapshots.json
+    """
     with open(SCRIPT_LOG, "w") as log:
         # close the log and reset contents
         log.close()
@@ -77,7 +42,12 @@ def clear_cache():
         print("No snapshots found... please run 'import' first.")
 
 
-def save_data(mode, data):
+def save_data(mode: str, data: Figure):
+    """
+    Writes passed 'data' to new file in OUTPUT_DIR
+    depending on the passed 'mode'.
+        - fileName = {mode}{current_time}.png, i.e. 'viz20240529.png'
+    """
     files = []
     # if output dir exists
     if os.path.exists(OUTPUT_DIR):
@@ -105,6 +75,10 @@ def save_data(mode, data):
 
 
 def clean_logs():
+    """
+    Tests whether any blank logs exist in
+    the DATA_DIR and removes them
+    """
     logs = os.listdir(DATA_DIR)
     # test logs...
     for l in logs:
@@ -121,8 +95,11 @@ def clean_logs():
             os.remove(logPath)
 
 
-# define the mode choices
 class Modes(str, Enum):
+    """
+    Defines choices for the 'mode' argument
+    """
+
     load = "load"
     viz = "viz"
     clear = "clear"
@@ -142,38 +119,56 @@ def main(
         str, typer.Option(help="How to orient the snapshot limit ['top'|'btm']")
     ] = "btm",
 ):
+    """
+    Accepts a 'mode' along with options
+        --s: save
+        --g: group by goal
+        --c: show clusters
+        --limit: limit the number of snapshots visualized
+        --orient: orient the snapshot limitation by
+            'top' (earliest) or 'btm' (latest)
+    """
     # ensure directories exist
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
-
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
 
-    # test args
+    # evaluate passed mode
     if mode == "load":
-        # if load mode...
-        # cleanup any empty logs
+        # if load...
+
+        # cleanup any empty logs...
         clean_logs()
 
-        # parse logs
+        # then parse the logs in DATA_DIR
         parse_logs(DATA_DIR)
 
     elif mode == "viz":
-        # if viz mode
+        # if viz mode...
+
+        # call visualize, pass CLI options
+        # and save Plotly figure to fig
         fig = visualize(g, c, limit, orient)
 
-        # if save flagged
+        # if save option passed...
         if s:
+            # save the figure
             save_data(mode, fig)
 
-        # show fig regardless
+        # check that the figure exists...
         if fig is not None:
+            # if so, show it
+            print("Visualizing data...")
             fig.show()
         else:
+            # else return error
             return print("No data found... please 'import' first.")
 
     elif mode == "clear":
-        # if clear mode
+        # if clear mode...
+
+        # clear the cache
         clear_cache()
 
 
