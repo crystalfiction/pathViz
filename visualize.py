@@ -30,9 +30,7 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
     if os.path.exists("snapshots.csv"):
 
         # read snapshots from snapshots.csv
-        snapshots = pd.read_csv("snapshots.csv", index_col=False).drop(
-            columns=["Unnamed: 0"]
-        )
+        snapshots = pd.read_csv("snapshots.csv").drop(columns=["Unnamed: 0"])
 
         # null fig for flagging
         fig = None

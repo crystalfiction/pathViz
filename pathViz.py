@@ -1,9 +1,8 @@
 """
     Module for reading, parsing, and visualizing DF path data
 
-    TODO: implement error handling
     TODO: refine heatmapping density calculation
-    TODO: implement loading bars for load, viz
+    TODO: add stats mode
 """
 
 import os
@@ -16,6 +15,7 @@ from typing_extensions import Annotated
 
 from parse import parse_logs
 from visualize import visualize
+from stats import get_stats
 from utils import clear_cache, save_data, clean_logs
 
 # load env vars
@@ -34,6 +34,7 @@ class Modes(str, Enum):
     load = "load"
     viz = "viz"
     clear = "clear"
+    stats = "stats"
 
 
 def main(
@@ -107,6 +108,20 @@ def main(
             # if so, show it
             print("Visualizing data...")
             fig.show()
+
+    elif mode == "stats":
+        # if stats mode...
+
+        # break if no snapshots
+        if not os.path.exists("snapshots.csv"):
+            return print("No data loaded, please run load.")
+
+        stats = get_stats(limit, orient)
+
+        # if save option passed...
+        if s:
+            # save the stats
+            save_data(OUTPUT_DIR, mode, stats)
 
     elif mode == "clear":
         # if clear mode...

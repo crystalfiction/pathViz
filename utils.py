@@ -34,7 +34,7 @@ def clean_logs(dir: str):
             os.remove(logPath)
 
 
-def save_data(dir: str, mode: str, data: Figure):
+def save_data(dir: str, mode: str, data):
     """
     Writes passed 'data' to new file in OUTPUT_DIR
     depending on the passed 'mode'.
@@ -61,9 +61,17 @@ def save_data(dir: str, mode: str, data: Figure):
         if mode == "viz":
             # write figure to image file
             content = data
-            content.write_image(dir + mode + fileName + ".png")
+            content.write_image(dir + fileName + mode + ".png")
+
+        if mode == "stats":
+            keys = data.keys()
+            # for each stat in list
+            for key in keys:
+                # write to csv
+                data[key].to_csv(dir + fileName + mode + "_" + key + ".csv")
+
     else:
-        return print("File already exists...")
+        raise FileExistsError("Save file already exists")
 
 
 def clear_cache():
