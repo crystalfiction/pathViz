@@ -282,9 +282,13 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
 
         # null fig for flagging
         fig = None
+        # if --limit 1 was passed, return error
+        if limit == 1:
+            return print("Limiting does not currently support --limit=1")
+
+        # if --c was passed, return error
         # check if heat option passed
         if heat:
-            # if --c was passed, return error
             if c:
                 return print("Heatmap does not support clustering.")
             # if heat create heatmap visual from snapshots
