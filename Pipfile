@@ -27,6 +27,7 @@ virtualenv = "==20.26.2"
 watchdog = "==4.0.1"
 xmltodict = "==0.13.0"
 typer = "*"
+faker = "*"
 
 [dev-packages]
 
