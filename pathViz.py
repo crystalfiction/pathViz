@@ -139,6 +139,6 @@ def main(
 
 if __name__ == "__main__":
     if DATA_DIR is None or OUTPUT_DIR is None:
-        print("Please specify your data & output directories in the .env file.")
+        raise NameError("Cannot generate directories from .env vars")
     else:
         typer.run(main)
