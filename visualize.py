@@ -17,6 +17,42 @@ col_pal_iter = itertools.cycle(col_pal)
 GOAL_KEY = {}
 
 
+def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
+    """
+    Reads snapshot data and creates visuals depending on
+    passed options.
+
+    Returns fig as type plotly Figure
+    """
+    # make sure snapshots exist
+    if os.path.exists("snapshots.csv"):
+
+        # read snapshots from snapshots.csv
+        snapshots = pd.read_csv("snapshots.csv", index_col=False).drop(
+            columns=["Unnamed: 0"]
+        )
+
+        # null fig for flagging
+        fig = None
+        # if --limit 1 was passed, return error
+        if limit == 1:
+            return print("Limiting does not currently support --limit=1")
+
+        # if --c was passed, return error
+        # check if heat option passed
+        if heat:
+            if c:
+                return print("Heatmap does not support clustering.")
+            # if heat create heatmap visual from snapshots
+            fig = create_heatmap(snapshots, g, limit, orient)
+        else:
+            # create scatter visual from snapshots
+            fig = create_scatter(snapshots, g, c, limit, orient)
+
+        # return the plotly fig
+        return fig
+
+
 def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
     """
     Processes passed df data and options & creates plotly visual
@@ -261,39 +297,3 @@ def create_heatmap(df: DataFrame, g: bool, limit: int, orient: str):
 
     # return the figure
     return fig
-
-
-def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
-    """
-    Reads snapshot data and creates visuals depending on
-    passed options.
-
-    Returns fig as type plotly Figure
-    """
-    # make sure snapshots exist
-    if os.path.exists("snapshots.csv"):
-
-        # read snapshots from snapshots.csv
-        snapshots = pd.read_csv("snapshots.csv", index_col=False).drop(
-            columns=["Unnamed: 0"]
-        )
-
-        # null fig for flagging
-        fig = None
-        # if --limit 1 was passed, return error
-        if limit == 1:
-            return print("Limiting does not currently support --limit=1")
-
-        # if --c was passed, return error
-        # check if heat option passed
-        if heat:
-            if c:
-                return print("Heatmap does not support clustering.")
-            # if heat create heatmap visual from snapshots
-            fig = create_heatmap(snapshots, g, limit, orient)
-        else:
-            # create scatter visual from snapshots
-            fig = create_scatter(snapshots, g, c, limit, orient)
-
-        # return the plotly fig
-        return fig
