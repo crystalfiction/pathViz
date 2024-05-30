@@ -55,9 +55,6 @@ def read_logs(dir: str):
                 # key: snapshotName, value: logDf
                 logData[snapshotName] = logDf
 
-                # floor the 'z' values for more uniformity in plotting
-                logDf["z"] = logDf["z"].apply(math.floor)
-
                 # append the un-formatted log file name to scriptLog
                 scriptLog.append(log)
 

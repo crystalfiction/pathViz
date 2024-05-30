@@ -1,7 +1,3 @@
-"""
-TODO: create heatmap module
-"""
-
 import os
 import pandas as pd
 from pandas import DataFrame
@@ -244,6 +240,7 @@ def create_heatmap(df: DataFrame, g: bool, limit: int, orient: str):
     # add all traces in traces list to fig
     fig.add_traces(traces)
     fig.update_traces(
+        overwrite=True,
         marker=dict(
             size=6, opacity=0.5, color=heat_df["n_density"], colorscale="Inferno_r"
         ),
@@ -289,7 +286,7 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
         if heat:
             # if --c was passed, return error
             if c:
-                return print("Heatmap does not contain cluster option")
+                return print("Heatmap does not support clustering.")
             # if heat create heatmap visual from snapshots
             fig = create_heatmap(snapshots, g, limit, orient)
         else:

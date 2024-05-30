@@ -5,32 +5,43 @@ from pandas import DataFrame
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV, LeaveOneOut
+from sklearn.svm import SVC
 
 
 GOAL_KEY = {}
 
 
 def get_density(df: DataFrame):
-    """"""
-    # remove non-numerical cols
-    X = df[["x", "y", "z"]]
-    X_features = df[["path_id", "path_goal", "snapshot"]]
+    """
+    Calculates probability density for dataset
 
-    # fit X to the model
+    Returns passed dataframe with scored 'n_dist' col
+    """
+    # split features/labels
+    X = df[["x", "y", "z"]]
+    X_labels = df[["path_id", "path_goal", "snapshot"]]
+
+    # fit X to KDE model
     kde = KernelDensity(kernel="gaussian", bandwidth=1)
     kde.fit(X)
+
+    # score each point on its density probability
     density = kde.score_samples(X)
+    # round to .2f
     density = [round(i) for i in density]
+    # normalize between 0:1
     normalized = normalize_data(density)
 
     # merge the data/features after fitting
-    processed = X.merge(X_features, on=X.index, sort=False).drop(columns=["key_0"])
+    processed = X.merge(X_labels, on=X.index, sort=False).drop(columns=["key_0"])
 
     # add distances to df['n_dist'] col
     processed["n_density"] = pd.Series(normalized).astype("float")
 
     # return the processed df
     return processed
+    # return None
 
 
 def parse_keys():
