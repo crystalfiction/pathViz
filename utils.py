@@ -7,6 +7,8 @@ import numpy as np
 from plotly.graph_objects import Figure
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KernelDensity
+from sklearn.model_selection import GridSearchCV
+from rich.progress import TextColumn, SpinnerColumn, Progress
 
 
 GOAL_KEY = {}
@@ -108,30 +110,39 @@ def get_density(df: DataFrame):
 
     Returns passed dataframe with scored 'n_dist' col
     """
-    # split features/labels
-    X = df[["x", "y", "z"]]
-    X_labels = df[["path_id", "path_goal", "snapshot"]]
+    with Progress(
+        SpinnerColumn(), TextColumn("[progress.description]{task.description}")
+    ) as progress:
+        progress.add_task(description="Fitting data...", total=None)
 
-    # fit X to KDE model
-    kde = KernelDensity(kernel="gaussian", bandwidth=1)
-    kde.fit(X)
+        # split features/labels
+        X = df[["x", "y", "z"]]
+        X_labels = df[["path_id", "path_goal", "snapshot"]]
 
-    # score each point on its density probability
-    density = kde.score_samples(X)
-    # round to .2f
-    density = [round(i) for i in density]
-    # normalize between 0:1
-    normalized = normalize_data(density)
+        # define params for test
+        params = {"bandwidth": np.logspace(-1, 1, 20)}
+        # define the grid with test params
+        grid = GridSearchCV(KernelDensity(kernel="gaussian", bandwidth=1), params)
+        # fit grid
+        grid.fit(X)
+        # use the best estimator from test params
+        kde = grid.best_estimator_
+        # score each point on its density probability
+        density = kde.score_samples(X)
+        # round to .2f
+        density = [round(i) for i in density]
+        # normalize between 0:1
+        normalized = normalize_data(density)
 
-    # merge the data/features after fitting
-    processed = X.merge(X_labels, on=X.index, sort=False).drop(columns=["key_0"])
+        # merge the data/features after fitting
+        processed = X.merge(X_labels, on=X.index, sort=False).drop(columns=["key_0"])
 
-    # add distances to df['n_dist'] col
-    processed["n_density"] = pd.Series(normalized).astype("float")
+        # add distances to df['n_dist'] col
+        processed["n_density"] = pd.Series(normalized).astype("float")
 
-    # return the processed df
-    return processed
-    # return None
+        # return the processed df
+        return processed
+        # return None
 
 
 def parse_keys():

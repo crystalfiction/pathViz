@@ -46,10 +46,10 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
             if g:
                 return print("Heatmap does not support grouping by goal.")
 
-            # if heat create heatmap visual from snapshots
+            # if --heat create heatmap visual from snapshots
             fig = create_heatmap(snapshots, limit, orient)
         else:
-            # create scatter visual from snapshots
+            # else create scatter visual from snapshots
             fig = create_scatter(snapshots, g, c, limit, orient)
 
         # return the plotly fig
@@ -207,8 +207,6 @@ def create_heatmap(df: DataFrame, limit: int, orient: str):
 
     # perform kneighbors on df
     heat_df = get_density(df)
-    if heat_df is None:
-        return
 
     # get unique path_id's
     uniques = heat_df["path_id"].unique()

@@ -1,8 +1,5 @@
 """
     Module for reading, parsing, and visualizing DF path data
-
-    TODO: refine heatmapping density calculation
-    TODO: add stats mode
 """
 
 import os
