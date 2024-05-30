@@ -1,10 +1,12 @@
 import os
+import time
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import itertools
+from rich.progress import track
 
 from utils import parse_keys, get_kmeans, get_density
 
@@ -38,13 +40,16 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
         if limit == 1:
             return print("Limiting does not currently support --limit=1")
 
-        # if --c was passed, return error
         # check if heat option passed
         if heat:
+            # break if incompatible options --g or --c passed
             if c:
                 return print("Heatmap does not support clustering.")
+            if g:
+                return print("Heatmap does not support grouping by goal.")
+
             # if heat create heatmap visual from snapshots
-            fig = create_heatmap(snapshots, g, limit, orient)
+            fig = create_heatmap(snapshots, limit, orient)
         else:
             # create scatter visual from snapshots
             fig = create_scatter(snapshots, g, c, limit, orient)
@@ -59,8 +64,6 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
 
     Returns fig as type plotly Figure
     """
-    print("Creating visuals...")
-
     # parse the path_goals defined in goals_key.xml
     GOAL_KEY = parse_keys()
 
@@ -110,7 +113,8 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
     # to be used as final traces list
     traces = []
     # for each snapshot id in uniques
-    for sid in uniques:
+    total = 0
+    for sid in track(uniques, description="Tracing snapshots..."):
         # cycle through trace_color iterator
         trace_color = next(col_pal_iter)
 
@@ -174,6 +178,10 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
             # append to traces list
             traces.append(trace)
 
+        # increment progress bar
+        time.sleep(0.01)
+        total += 1
+
     # add all traces in traces list to fig
     fig.add_traces(traces)
 
@@ -195,10 +203,8 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
     return fig
 
 
-def create_heatmap(df: DataFrame, g: bool, limit: int, orient: str):
+def create_heatmap(df: DataFrame, limit: int, orient: str):
     """ """
-    print("Creating visuals...")
-
     # parse the path_goals defined in goals_key.xml
     GOAL_KEY = parse_keys()
 
@@ -253,7 +259,8 @@ def create_heatmap(df: DataFrame, g: bool, limit: int, orient: str):
     # to be used as final traces list
     traces = []
     # for unique path_ids
-    for pid in uniques:
+    total = 0
+    for pid in track(uniques, description="Creating traces..."):
         # filter df by current pid
         vectors = heat_df[heat_df["path_id"] == pid]
         # get the common goal for this path
@@ -270,6 +277,10 @@ def create_heatmap(df: DataFrame, g: bool, limit: int, orient: str):
         )
         # append to traces list
         traces.append(trace)
+
+        # increment progress bar
+        time.sleep(0.01)
+        total += 1
 
     # add all traces in traces list to fig
     fig.add_traces(traces)

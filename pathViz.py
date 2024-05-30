@@ -3,6 +3,7 @@
 
     TODO: implement error handling
     TODO: refine heatmapping density calculation
+    TODO: implement loading bars for load, viz
 """
 
 import os

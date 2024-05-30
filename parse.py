@@ -3,7 +3,9 @@
 """
 
 import os
+import time
 import pandas as pd
+from rich.progress import track
 
 
 GOAL_KEY = {}
@@ -14,8 +16,6 @@ def parse_logs(dir: str):
     Parse logs in the passed dir,
     then makes aggregated snapshots files.
     """
-    print("Parsing logs...")
-
     # read the logs
     logData = read_logs(dir)
     # if new logs exist...
@@ -51,7 +51,8 @@ def read_logs(dir: str):
     # if logFiles exist...
     if len(logNames) > 0:
         # for each log...
-        for log in logNames:
+        total = 0
+        for log in track(logNames, description="Processing logs..."):
             # test if log as already been parsed...
             if not test_log(log):
                 # if not...
@@ -74,8 +75,12 @@ def read_logs(dir: str):
                 # append the un-formatted log file name to scriptLog
                 scriptLog.append(log)
 
-    # print the number of logs currently being processed
-    print(str(len(scriptLog)) + " new logs found...")
+                # increment progress bar
+                time.sleep(0.01)
+                total += 1
+
+        # print the number of logs currently being processed
+        print(f"Processed {total} new logs...")
 
     # if scriptLog is not empty
     # i.e. if new logs were found
