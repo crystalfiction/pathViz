@@ -39,7 +39,7 @@ class Modes(str, Enum):
 
 def main(
     mode: Modes,
-    s: Annotated[bool, typer.Option(help="Save the visual once created.")] = False,
+    s: Annotated[bool, typer.Option(help="Save the visual or stats.")] = False,
     g: Annotated[bool, typer.Option(help="Group visual by path goal.")] = False,
     c: Annotated[
         bool, typer.Option(help="Generate KMeans clusters per snapshot.")
