@@ -1,5 +1,8 @@
 """
     Module for reading, parsing, and visualizing DF path data
+
+    TODO: implement error handling
+    TODO: refine heatmapping density calculation
 """
 
 import os
@@ -71,14 +74,23 @@ def main(
         # cleanup any empty logs...
         clean_logs(DATA_DIR)
 
-        # then parse the logs in DATA_DIR
-        parse_logs(DATA_DIR)
-
-        # print update
-        print("Done.")
+        # try to parse the logs...
+        try:
+            # if valid logs exist
+            # then parse the logs in DATA_DIR
+            parse_logs(DATA_DIR)
+            # print update
+            print("Done.")
+        except KeyError:
+            # else no valid logs exist in DATA_DIR
+            return print("No valid data exists in the provided DATA_DIR.")
 
     elif mode == "viz":
         # if viz mode...
+
+        # break if no snapshots
+        if not os.path.exists("snapshots.csv"):
+            return print("No data loaded, please run load.")
 
         # call visualize, pass CLI options
         # and save Plotly figure to fig
@@ -94,18 +106,19 @@ def main(
             # if so, show it
             print("Visualizing data...")
             fig.show()
-        else:
-            # else return error
-            return print("No data found... please 'import' first.")
 
     elif mode == "clear":
         # if clear mode...
 
-        # clear the cache
-        clear_cache()
-
-        # print update
-        print("Done.")
+        # try to clear the cache
+        try:
+            # clear the cache
+            clear_cache()
+            # print update
+            print("Done.")
+        except ValueError:
+            # if scriptLog cache is empty
+            return print("No data to clear.")
 
 
 if __name__ == "__main__":

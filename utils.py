@@ -71,20 +71,27 @@ def clear_cache():
     Wipes the contents of logScript.txt
     and removes existing snapshots.csv & snapshots.json
     """
-    with open(SCRIPT_LOG, "w") as log:
-        # close the log and reset contents
-        log.close()
+    logEmpty = False
+    with open(SCRIPT_LOG, "r") as log:
+        content = log.read()
+        if content == "":
+            logEmpty = True
+
+    # if log isn't empty
+    if not logEmpty:
+        with open(SCRIPT_LOG, "w") as log:
+            # close the log and reset contents
+            log.close()
+    else:
+        raise ValueError()
 
     # print update
     print("Script cache cleared...")
 
     # remove snapshots
-    try:
-        os.remove("snapshots.csv")
-        os.remove("snapshots.json")
-        print("Removed snapshots files...")
-    except:
-        print("No snapshots found...")
+    os.remove("snapshots.csv")
+    os.remove("snapshots.json")
+    print("Removed snapshots files...")
 
 
 def get_density(df: DataFrame):

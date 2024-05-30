@@ -22,6 +22,9 @@ def parse_logs(dir: str):
     if logData is not None:
         # make snapshots of the logData
         make_snapshots(logData)
+    else:
+        # else, raise KeyError
+        raise KeyError()
 
 
 def read_logs(dir: str):
