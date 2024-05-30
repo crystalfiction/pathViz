@@ -24,6 +24,7 @@ load_dotenv()
 # save env vars
 DATA_DIR = os.getenv("DATA_DIR")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
+SCRIPT_LOG = "scriptLog.txt"
 
 
 class Modes(str, Enum):
@@ -68,6 +69,9 @@ def main(
         os.mkdir(DATA_DIR)
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
+    if not os.path.exists(SCRIPT_LOG):
+        with open("scriptLog.txt", "w") as f:
+            f.close()
 
     # evaluate passed mode
     if mode == "load":
