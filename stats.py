@@ -112,6 +112,9 @@ def dist_per_goal(df: DataFrame, limit: int, orient: str):
     avg_dist_per_goal = pd.DataFrame(goal_dists, index=gids_fmt).rename(
         columns={0: "avg_dist"}
     )
+    # sort by avg_Dist
+    avg_dist_per_goal = avg_dist_per_goal.sort_values("avg_dist", ascending=False)
+    # change index name
     avg_dist_per_goal.index.name = "goal"
 
     return avg_dist_per_goal, mcg_fmt
@@ -178,6 +181,7 @@ def dist_per_snapshot(df: DataFrame, limit: int, orient: str):
     avg_dist_per_shot = pd.DataFrame(
         snapshot_dists, index=["00" + str(s) for s in sids]
     ).rename(columns={0: "avg_dist"})
+    # sort by avg_dist
     avg_dist_per_shot.index.name = "snapshot"
 
     return avg_dist_per_shot

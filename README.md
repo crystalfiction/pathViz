@@ -137,9 +137,9 @@ snapshot
 goal
 SeekItemForStorage     28.27
 StoreItem              15.00
-SeekEatingChair2        0.00
-WorkAtBuilding          5.00
 StartGiveFoodWater     11.00
+WorkAtBuilding          5.00
+SeekEatingChair2        0.00
 
 -----------------------------------
 ```
