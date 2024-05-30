@@ -1,15 +1,90 @@
-import math
+import os
+import time
 import xmltodict
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
+from plotly.graph_objects import Figure
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KernelDensity
-from sklearn.model_selection import GridSearchCV, LeaveOneOut
-from sklearn.svm import SVC
 
 
 GOAL_KEY = {}
+SCRIPT_LOG = "scriptLog.txt"
+
+
+def clean_logs(dir: str):
+    """
+    Tests whether any blank logs exist in
+    the DATA_DIR and removes them
+    """
+    logs = os.listdir(dir)
+    # test logs...
+    for l in logs:
+        logPath = dir + l
+        test = None
+        with open(logPath, "r") as f:
+            content = f.readline()
+            if content == "":
+                test = True
+
+        # if test passed...
+        if test is not None:
+            # delete the empty log
+            os.remove(logPath)
+
+
+def save_data(dir: str, mode: str, data: Figure):
+    """
+    Writes passed 'data' to new file in OUTPUT_DIR
+    depending on the passed 'mode'.
+        - fileName = {mode}{current_time}.png, i.e. 'viz20240529.png'
+    """
+    files = []
+    # if output dir exists
+    if os.path.exists(dir):
+        # get files
+        files = os.listdir(dir)
+    else:
+        # else make dir
+        os.makedirs("output/")
+
+    t = time.localtime()
+    current_time = time.strftime("%Y%d%H%M", t)
+    fileName = current_time
+
+    # if file doesn't already exist
+    if fileName not in files:
+        # write it
+        content = ""
+        # if viz mode...
+        if mode == "viz":
+            # write figure to image file
+            content = data
+            content.write_image(dir + mode + fileName + ".png")
+    else:
+        return print("File already exists...")
+
+
+def clear_cache():
+    """
+    Wipes the contents of logScript.txt
+    and removes existing snapshots.csv & snapshots.json
+    """
+    with open(SCRIPT_LOG, "w") as log:
+        # close the log and reset contents
+        log.close()
+
+    # print update
+    print("Script cache cleared...")
+
+    # remove snapshots
+    try:
+        os.remove("snapshots.csv")
+        os.remove("snapshots.json")
+        print("Removed snapshots files...")
+    except:
+        print("No snapshots found...")
 
 
 def get_density(df: DataFrame):

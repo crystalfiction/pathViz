@@ -3,17 +3,16 @@
 """
 
 import os
-import time
 import typer
 from enum import Enum
 
 import pandas as pd
 from dotenv import load_dotenv
 from typing_extensions import Annotated
-from plotly.graph_objects import Figure
 
 from parse import parse_logs
 from visualize import visualize
+from utils import clear_cache, save_data, clean_logs
 
 # load env vars
 load_dotenv()
@@ -21,81 +20,6 @@ load_dotenv()
 # save env vars
 DATA_DIR = os.getenv("DATA_DIR")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
-SCRIPT_LOG = "scriptLog.txt"
-
-
-def clear_cache():
-    """
-    Wipes the contents of logScript.txt
-    and removes existing snapshots.csv & snapshots.json
-    """
-    with open(SCRIPT_LOG, "w") as log:
-        # close the log and reset contents
-        log.close()
-
-    # print update
-    print("Script cache cleared...")
-
-    # remove snapshots
-    try:
-        os.remove("snapshots.csv")
-        os.remove("snapshots.json")
-        print("Removed snapshots files...")
-    except:
-        print("No snapshots found...")
-
-
-def save_data(mode: str, data: Figure):
-    """
-    Writes passed 'data' to new file in OUTPUT_DIR
-    depending on the passed 'mode'.
-        - fileName = {mode}{current_time}.png, i.e. 'viz20240529.png'
-    """
-    files = []
-    # if output dir exists
-    if os.path.exists(OUTPUT_DIR):
-        # get files
-        files = os.listdir(OUTPUT_DIR)
-    else:
-        # else make dir
-        os.makedirs("output/")
-
-    t = time.localtime()
-    current_time = time.strftime("%Y%d%H%M", t)
-    fileName = current_time
-
-    # if file doesn't already exist
-    if fileName not in files:
-        # write it
-        content = ""
-        # if viz mode...
-        if mode == "viz":
-            # write figure to image file
-            content = data
-            content.write_image(OUTPUT_DIR + mode + fileName + ".png")
-    else:
-        return print("File already exists...")
-
-
-def clean_logs():
-    """
-    Tests whether any blank logs exist in
-    the DATA_DIR and removes them
-    """
-    logs = os.listdir(DATA_DIR)
-    # test logs...
-    for l in logs:
-        logPath = DATA_DIR + l
-        test = None
-        with open(logPath, "r") as f:
-            content = f.readline()
-            if content == "":
-                test = True
-
-        # if test passed...
-        if test is not None:
-            # delete the empty log
-            os.remove(logPath)
 
 
 class Modes(str, Enum):
@@ -145,7 +69,7 @@ def main(
         # if load...
 
         # cleanup any empty logs...
-        clean_logs()
+        clean_logs(DATA_DIR)
 
         # then parse the logs in DATA_DIR
         parse_logs(DATA_DIR)
@@ -163,7 +87,7 @@ def main(
         # if save option passed...
         if s:
             # save the figure
-            save_data(mode, fig)
+            save_data(OUTPUT_DIR, mode, fig)
 
         # check that the figure exists...
         if fig is not None:

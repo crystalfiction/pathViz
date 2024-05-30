@@ -5,8 +5,6 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import itertools
-import math
-from sklearn.cluster import KMeans
 
 from utils import parse_keys, get_kmeans, get_density
 

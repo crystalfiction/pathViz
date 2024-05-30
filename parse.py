@@ -4,8 +4,6 @@
 
 import os
 import pandas as pd
-from pandas import DataFrame
-import math
 
 
 GOAL_KEY = {}
