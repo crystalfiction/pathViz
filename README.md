@@ -88,18 +88,25 @@ python pathViz.py viz
 ```
 
 Accepted arguments:
-- `--g` - color paths by path goal - Default: `False`
+- `--g` - color each unique path by its path goal - Default: `False`
 - `--c`: generate clusters for each snapshot using KMeans - Default: `False`
+- `--heat`: generate a heatmap using the entire snapshot collection - Default: `False`
 - `--limit`: limit the number of snapshots visualized - Default: `0`
 - `--orient`: orient the limitation by "top," starting from the earliest snapshot, or "btm" starting from the latest - Default: `btm`
 
-Example
+Examples
 ```py
-# tells viz to generate a visual
-# using only the last 3 snapshots: --limit 3,
-# starting from the latest snapshot: --orient btm,
-# including snapshot clusters: --c
-python pathViz.py viz --limit 3 --orient btm --c
+# Simple example:
+# limit to 3 snapshots: --limit 3,
+# starting from the latest snapshot: --orient btm
+python pathViz.py viz --limit 3 --orient btm
+
+# Complex example:
+# limit to 10 snapshots: --limit 10,
+# starting from the earliest(top) snapshot: --orient top,
+# including snapshot clusters: --c,
+# grouped by goal: --g
+python pathViz.py viz --limit 4 --orient top --c --g
 ```
 
 ### Clear your snapshots
