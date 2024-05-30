@@ -142,11 +142,7 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
                 z=[kmeans_z],
                 name=str(sid) + "_cluster",
                 mode="markers",
-                marker=dict(
-                    size=12,
-                    opacity=1,
-                    color=trace_color,
-                ),
+                marker=dict(size=12, opacity=1, color="White"),
                 legendgroup=str(sid),
                 legendgrouptitle_text=str(sid),
             )
