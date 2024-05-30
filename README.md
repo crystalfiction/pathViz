@@ -118,7 +118,10 @@ python pathViz.py clear
 *A top-down perspective*
 
 ![newFort_y1_3d](images/newFort_y1_3d.png)
-*A 3D perspective*
+*A skewed, 3D perspective for scale*
 
 ![newFort_y1_zoomed](images/newFort_y1_zoomed.png)
 *A zoomed-in, 3D perspective. We can see overall fort structure beginning to form.*
+
+![newFort_y1_heat](images/newFort_y1_heat.png)
+*A view demonstrating the heatmap functionality*
