@@ -3,17 +3,17 @@
 """
 
 import os
-import time
 import typer
 from enum import Enum
 
 import pandas as pd
 from dotenv import load_dotenv
 from typing_extensions import Annotated
-from plotly.graph_objects import Figure
 
 from parse import parse_logs
 from visualize import visualize
+from stats import get_stats
+from utils import clear_cache, save_data, clean_logs
 
 # load env vars
 load_dotenv()
@@ -24,80 +24,6 @@ OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 
 
-def clear_cache():
-    """
-    Wipes the contents of logScript.txt
-    and removes existing snapshots.csv & snapshots.json
-    """
-    with open(SCRIPT_LOG, "w") as log:
-        # close the log and reset contents
-        log.close()
-
-    # print update
-    print("Script cache cleared...")
-
-    # remove snapshots
-    try:
-        os.remove("snapshots.csv")
-        os.remove("snapshots.json")
-        print("Removed snapshots files...")
-    except:
-        print("No snapshots found...")
-
-
-def save_data(mode: str, data: Figure):
-    """
-    Writes passed 'data' to new file in OUTPUT_DIR
-    depending on the passed 'mode'.
-        - fileName = {mode}{current_time}.png, i.e. 'viz20240529.png'
-    """
-    files = []
-    # if output dir exists
-    if os.path.exists(OUTPUT_DIR):
-        # get files
-        files = os.listdir(OUTPUT_DIR)
-    else:
-        # else make dir
-        os.makedirs("output/")
-
-    t = time.localtime()
-    current_time = time.strftime("%Y%d%H%M", t)
-    fileName = current_time
-
-    # if file doesn't already exist
-    if fileName not in files:
-        # write it
-        content = ""
-        # if viz mode...
-        if mode == "viz":
-            # write figure to image file
-            content = data
-            content.write_image(OUTPUT_DIR + mode + fileName + ".png")
-    else:
-        return print("File already exists...")
-
-
-def clean_logs():
-    """
-    Tests whether any blank logs exist in
-    the DATA_DIR and removes them
-    """
-    logs = os.listdir(DATA_DIR)
-    # test logs...
-    for l in logs:
-        logPath = DATA_DIR + l
-        test = None
-        with open(logPath, "r") as f:
-            content = f.readline()
-            if content == "":
-                test = True
-
-        # if test passed...
-        if test is not None:
-            # delete the empty log
-            os.remove(logPath)
-
-
 class Modes(str, Enum):
     """
     Defines choices for the 'mode' argument
@@ -106,14 +32,18 @@ class Modes(str, Enum):
     load = "load"
     viz = "viz"
     clear = "clear"
+    stats = "stats"
 
 
 def main(
     mode: Modes,
-    s: Annotated[bool, typer.Option(help="Save the visual once created.")] = False,
+    s: Annotated[bool, typer.Option(help="Save the visual or stats.")] = False,
     g: Annotated[bool, typer.Option(help="Group visual by path goal.")] = False,
     c: Annotated[
         bool, typer.Option(help="Generate KMeans clusters per snapshot.")
+    ] = False,
+    heat: Annotated[
+        bool, typer.Option(help="Generate a time-dependent heatmap.")
     ] = False,
     limit: Annotated[
         int, typer.Option(help="Limit the number of snapshots visualized.")
@@ -136,53 +66,80 @@ def main(
         os.mkdir(DATA_DIR)
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
+    if not os.path.exists(SCRIPT_LOG):
+        with open("scriptLog.txt", "w") as f:
+            f.close()
 
     # evaluate passed mode
     if mode == "load":
         # if load...
 
         # cleanup any empty logs...
-        clean_logs()
+        clean_logs(DATA_DIR)
 
-        # then parse the logs in DATA_DIR
-        parse_logs(DATA_DIR)
-
-        # print update
-        print("Done.")
+        # try to parse the logs...
+        try:
+            # if valid logs exist
+            # then parse the logs in DATA_DIR
+            parse_logs(DATA_DIR)
+            # print update
+            print("Done.")
+        except KeyError:
+            # else no valid logs exist in DATA_DIR
+            return print("No valid data exists in the provided DATA_DIR.")
 
     elif mode == "viz":
         # if viz mode...
 
+        # break if no snapshots
+        if not os.path.exists("snapshots.csv"):
+            return print("No data loaded, please run load.")
+
         # call visualize, pass CLI options
         # and save Plotly figure to fig
-        fig = visualize(g, c, limit, orient)
+        fig = visualize(g, c, heat, limit, orient)
 
         # if save option passed...
         if s:
             # save the figure
-            save_data(mode, fig)
+            save_data(OUTPUT_DIR, mode, fig)
 
         # check that the figure exists...
         if fig is not None:
             # if so, show it
             print("Visualizing data...")
             fig.show()
-        else:
-            # else return error
-            return print("No data found... please 'import' first.")
+
+    elif mode == "stats":
+        # if stats mode...
+
+        # break if no snapshots
+        if not os.path.exists("snapshots.csv"):
+            return print("No data loaded, please run load.")
+
+        stats = get_stats(limit, orient)
+
+        # if save option passed...
+        if s:
+            # save the stats
+            save_data(OUTPUT_DIR, mode, stats)
 
     elif mode == "clear":
         # if clear mode...
 
-        # clear the cache
-        clear_cache()
-
-        # print update
-        print("Done.")
+        # try to clear the cache
+        try:
+            # clear the cache
+            clear_cache()
+            # print update
+            print("Done.")
+        except ValueError:
+            # if scriptLog cache is empty
+            return print("No data to clear.")
 
 
 if __name__ == "__main__":
     if DATA_DIR is None or OUTPUT_DIR is None:
-        print("Please specify your data & output directories in the .env file.")
+        raise NameError("Cannot generate directories from .env vars")
     else:
         typer.run(main)

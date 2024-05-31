@@ -3,12 +3,28 @@
 """
 
 import os
+import time
 import pandas as pd
-from pandas import DataFrame
-import math
+from rich.progress import track
 
 
 GOAL_KEY = {}
+
+
+def parse_logs(dir: str):
+    """
+    Parse logs in the passed dir,
+    then makes aggregated snapshots files.
+    """
+    # read the logs
+    logData = read_logs(dir)
+    # if new logs exist...
+    if logData is not None:
+        # make snapshots of the logData
+        make_snapshots(logData)
+    else:
+        # else, raise KeyError
+        raise KeyError()
 
 
 def read_logs(dir: str):
@@ -35,7 +51,8 @@ def read_logs(dir: str):
     # if logFiles exist...
     if len(logNames) > 0:
         # for each log...
-        for log in logNames:
+        total = 0
+        for log in track(logNames, description="Parsing logs..."):
             # test if log as already been parsed...
             if not test_log(log):
                 # if not...
@@ -55,14 +72,15 @@ def read_logs(dir: str):
                 # key: snapshotName, value: logDf
                 logData[snapshotName] = logDf
 
-                # floor the 'z' values for more uniformity in plotting
-                logDf["z"] = logDf["z"].apply(math.floor)
-
                 # append the un-formatted log file name to scriptLog
                 scriptLog.append(log)
 
-    # print the number of logs currently being processed
-    print(str(len(scriptLog)) + " new logs found...")
+                # increment progress bar
+                time.sleep(0.01)
+                total += 1
+
+        # print the number of logs currently being processed
+        print(f"Processed {total} new logs...")
 
     # if scriptLog is not empty
     # i.e. if new logs were found
@@ -80,6 +98,26 @@ def read_logs(dir: str):
     else:
         # if no new logs, return None
         return None
+
+
+def test_log(log: str):
+    """
+    Accepts a log, where log = the name of a
+    log in data/, and tests if exists in scriptLog.txt
+
+    Returns True if already parsed, else False
+    """
+    # check if log has already been read
+    parsed = False
+    with open("scriptLog.txt", "r") as f:
+        lines = f.readlines()
+        for row in lines:
+            if row.find(log) != -1:
+                # log name was found
+                parsed = True
+
+    # returns True if log exists in scriptLog, else False
+    return parsed
 
 
 def make_snapshots(logs: dict):
@@ -123,41 +161,11 @@ def make_snapshots(logs: dict):
     # ensure dtypes
     final_df["snapshot"] = final_df["snapshot"].astype("str")
 
+    # prefix the path_ids with snapshot_id
+    final_df["path_id"] = (
+        final_df["snapshot"].astype("str") + "_" + final_df["path_id"].astype("str")
+    )
+
     # create snapshot files
     final_df.to_csv("snapshots.csv")
     final_df.to_json("snapshots.json", orient="records")
-
-
-def test_log(log: str):
-    """
-    Accepts a log, where log = the name of a
-    log in data/, and tests if exists in scriptLog.txt
-
-    Returns True if already parsed, else False
-    """
-    # check if log has already been read
-    parsed = False
-    with open("scriptLog.txt", "r") as f:
-        lines = f.readlines()
-        for row in lines:
-            if row.find(log) != -1:
-                # log name was found
-                parsed = True
-
-    # returns True if log exists in scriptLog, else False
-    return parsed
-
-
-def parse_logs(dir: str):
-    """
-    Parse logs in the passed dir,
-    then makes aggregated snapshots files.
-    """
-    print("Parsing logs...")
-
-    # read the logs
-    logData = read_logs(dir)
-    # if new logs exist...
-    if logData is not None:
-        # make snapshots of the logData
-        make_snapshots(logData)

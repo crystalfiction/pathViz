@@ -77,33 +77,76 @@ enable logPaths
 ```
 
 ### Load some data
-```py
+```bash
 # make sure your terminal is still in the pipenv shell
 python pathViz.py load
 ```
 
 ### Visualize some data
-```py
+```bash
 python pathViz.py viz
 ```
 
 Accepted arguments:
-- `--g` - color paths by path goal - Default: `False`
+- `--g` - color each unique path by its path goal - Default: `False`
 - `--c`: generate clusters for each snapshot using KMeans - Default: `False`
+- `--heat`: generate a heatmap using the entire snapshot collection - Default: `False`
 - `--limit`: limit the number of snapshots visualized - Default: `0`
 - `--orient`: orient the limitation by "top," starting from the earliest snapshot, or "btm" starting from the latest - Default: `btm`
 
-Example
-```py
-# tells viz to generate a visual
-# using only the last 3 snapshots: --limit 3,
-# starting from the latest snapshot: --orient btm,
-# including snapshot clusters: --c
-python pathViz.py viz --limit 3 --orient btm --c
+Simple example
+```bash
+# limit to 3 snapshots: --limit 3,
+# starting from the latest snapshot: --orient btm
+python pathViz.py viz --limit 3 --orient btm
 ```
 
+More complex example
+```bash
+# limit to 10 snapshots: --limit 10,
+# starting from the earliest(top) snapshot: --orient top,
+# including snapshot clusters: --c,
+# grouped by goal: --g
+python pathViz.py viz --limit 4 --orient btm --c --g
+```
+
+The output, using my fort as data
+![newFort_example_viz](images/newFort_example_viz.png)
+
+### Generate some stats
+```bash
+python pathViz.py stats
+```
+
+Returned stats example
+```bash
+-----------------------------------
+pathViz Stats
+-----------------------------------
+'Total avg dist travelled: 20.1'
+
+           avg_dist         common_goal
+snapshot
+001000625     12.57  SeekItemForStorage
+001000704     20.00           StoreItem
+001000711     27.71  SeekItemForStorage
+
+'Most common goal: SeekItemForStorage'
+
+                    avg_dist
+goal
+SeekItemForStorage     28.27
+StoreItem              15.00
+StartGiveFoodWater     11.00
+WorkAtBuilding          5.00
+SeekEatingChair2        0.00
+
+-----------------------------------
+```
+
+
 ### Clear your snapshots
-```py
+```bash
 python pathViz.py clear
 ```
 
@@ -118,7 +161,13 @@ python pathViz.py clear
 *A top-down perspective*
 
 ![newFort_y1_3d](images/newFort_y1_3d.png)
-*A 3D perspective*
+*A skewed, 3D perspective for scale*
 
 ![newFort_y1_zoomed](images/newFort_y1_zoomed.png)
 *A zoomed-in, 3D perspective. We can see overall fort structure beginning to form.*
+
+![newFort_y1_heat](images/newFort_y1_heat.png)
+*A view demonstrating the heatmap functionality*
+
+![newFort_y1_clusters](images/newFort_y1_clusters.png)
+*A view demonstrating clustering through K Means*
