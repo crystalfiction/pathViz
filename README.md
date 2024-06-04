@@ -50,6 +50,8 @@ When prompted, enter `gui`.
 
 Enter the path to your Dwarf Fortress game directory, then follow the `gui` instructions.
 
+To end the session, from the `Powershell` window press `ctrl-c` (press twice to double check the process was aborted).
+
 ## CLI
 
 Locate the `pathViz/.env` file, insert the path to your Dwarf Fortress game directory to `DF_PATH`, and observe its other variables
@@ -82,12 +84,12 @@ enable logPaths
 ### Load some data
 ```bash
 # make sure your terminal is still in the pipenv shell
-python pathViz.py load
+python cli.py load
 ```
 
 ### Visualize some data
 ```bash
-python pathViz.py viz
+python cli.py viz
 ```
 
 Accepted arguments:
@@ -101,7 +103,7 @@ Simple example
 ```bash
 # limit to 3 snapshots: --limit 3,
 # starting from the latest snapshot: --orient btm
-python pathViz.py viz --limit 3 --orient btm
+python cli.py viz --limit 3 --orient btm
 ```
 
 More complex example
@@ -110,7 +112,7 @@ More complex example
 # starting from the earliest(top) snapshot: --orient top,
 # including snapshot clusters: --c,
 # grouped by goal: --g
-python pathViz.py viz --limit 4 --orient btm --c --g
+python cli.py viz --limit 4 --orient btm --c --g
 ```
 
 The output, using my fort as data
@@ -118,7 +120,7 @@ The output, using my fort as data
 
 ### Generate some stats
 ```bash
-python pathViz.py stats
+python cli.py stats
 ```
 
 Returned stats example
@@ -150,7 +152,7 @@ SeekEatingChair2        0.00
 
 ### Clear your snapshots
 ```bash
-python pathViz.py clear
+python cli.py clear
 ```
 
 `clear` mode intentionally leaves path log files in the `DATA_DIR` persistent.
