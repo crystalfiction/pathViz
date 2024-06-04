@@ -5,23 +5,24 @@
 import os
 import typer
 from enum import Enum
-
-import pandas as pd
 from dotenv import load_dotenv
 from typing_extensions import Annotated
 
-from parse import parse_logs
+from parse import parse
 from visualize import visualize
 from stats import get_stats
 from utils import clear_cache, save_data, clean_logs
+from setup import trySetup
 
 # load env vars
 load_dotenv()
 
 # save env vars
+DF_PATH = os.getenv("DF_PATH")
 DATA_DIR = os.getenv("DATA_DIR")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
+HACK_SCRIPT = "logPaths.lua"
 
 
 class Modes(str, Enum):
@@ -35,7 +36,7 @@ class Modes(str, Enum):
     stats = "stats"
 
 
-def main(
+def CLI(
     mode: Modes,
     s: Annotated[bool, typer.Option(help="Save the visual or stats.")] = False,
     g: Annotated[bool, typer.Option(help="Group visual by path goal.")] = False,
@@ -61,14 +62,18 @@ def main(
         --orient: orient the snapshot limitation by
             'top' (earliest) or 'btm' (latest)
     """
-    # ensure directories exist
-    if not os.path.exists(DATA_DIR):
-        os.mkdir(DATA_DIR)
-    if not os.path.exists(OUTPUT_DIR):
-        os.mkdir(OUTPUT_DIR)
-    if not os.path.exists(SCRIPT_LOG):
-        with open("scriptLog.txt", "w") as f:
-            f.close()
+    # ensure valid dfPath
+    if DF_PATH:
+        if not os.path.exists(DF_PATH):
+            return print("Could not locate the provided DF_PATH directory.")
+    else:
+        pass
+
+    # try to setup files
+    try:
+        result = trySetup(DF_PATH, DATA_DIR, OUTPUT_DIR, HACK_SCRIPT)
+    except Exception as err:
+        return print(f"Error setting up files {err}")
 
     # evaluate passed mode
     if mode == "load":
@@ -81,7 +86,7 @@ def main(
         try:
             # if valid logs exist
             # then parse the logs in DATA_DIR
-            parse_logs(DATA_DIR)
+            logData, logNames = parse(DATA_DIR)
             # print update
             print("Done.")
         except KeyError:
@@ -97,7 +102,7 @@ def main(
 
         # call visualize, pass CLI options
         # and save Plotly figure to fig
-        fig = visualize(g, c, heat, limit, orient)
+        fig, layout = visualize(g, c, heat, limit, orient)
 
         # if save option passed...
         if s:
@@ -117,7 +122,7 @@ def main(
         if not os.path.exists("snapshots.csv"):
             return print("No data loaded, please run load.")
 
-        stats = get_stats(limit, orient)
+        stats, verbose = get_stats(limit, orient)
 
         # if save option passed...
         if s:
@@ -139,7 +144,4 @@ def main(
 
 
 if __name__ == "__main__":
-    if DATA_DIR is None or OUTPUT_DIR is None:
-        raise NameError("Cannot generate directories from .env vars")
-    else:
-        typer.run(main)
+    typer.run(CLI)

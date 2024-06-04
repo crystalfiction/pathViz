@@ -1,7 +1,28 @@
+# python
 .venv/
 __pycache__
 Pipfile.lock
+
+# node dependencies
+gui/node_modules
+gui/.pnp
+gui/.pnp.js
+gui/package-lock.json
+
+# pathViz
+logs/*
 data/*
 output/*
 snapshots.*
 scriptLog.txt
+
+# react misc
+gui/.DS_Store
+gui/.env.local
+gui/.env.development.local
+gui/.env.test.local
+gui/.env.production.local
+
+gui/npm-debug.log*
+gui/yarn-debug.log*
+gui/yarn-error.log*

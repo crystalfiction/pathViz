@@ -1,26 +1,31 @@
 --@enable = true
 --@module = true
 
+-- define module name
 local GLOBAL_KEY = 'logPaths'
 
+-- import repeat
 local repeatUtil = require("repeat-util")
+-- define modId
 local modId = "logPaths"
-
+-- define filePrefix to pathViz/ data directory
 local filePrefix = ""
 
+-- assert enabled
 enabled = enabled or false
 function isEnabled()
     return enabled
 end
 
--- get all units
-local function get_info()
+local function get_paths()
+    -- define final data array
     local data = {}
 
+    -- loop through all citizens
     for _, v in ipairs(dfhack.units.getCitizens(true, true)) do
-        -- check unit flags for civilians
+        -- check that the unit is a dwarf...
         if (v.race == 572) then
-            -- log data
+            -- define the new unit data struc
             local newUnit = {
                 goal = v.path.goal,
                 path = {
@@ -30,13 +35,15 @@ local function get_info()
                 }
             }
 
+            -- if newUnit exists...
             if newUnit ~= nil then
+                -- insert to final data array
                 table.insert(data, newUnit)
             end
         end
     end
 
-    -- returns the points
+    -- return the final data array
     return data
 end
 
@@ -52,7 +59,6 @@ end
 local function write_to_file(data)
     local filepath = string.gsub(get_world_date_str(), "-", "") .. ".txt"
     local logFile = io.open(filePrefix .. filepath, "w")
-
     local unitCount = 0
 
     if logFile ~= nil then
@@ -118,22 +124,31 @@ if not dfhack_flags.enable then
     return
 end
 
+-- check if module enabled...
 if dfhack_flags.enable_state then
+    -- if module is enabled
     -- monitor dwarf positions every 1wk or 8400 ticks
+    -- *called before setting enabled flag for immediate logging*
     repeatUtil.scheduleEvery(modId .. 'every 1wk', 8400, 'ticks', function()
         -- get the data
-        local newData = get_info()
-
+        local newData = get_paths()
         -- if data exists, write to file
         if newData then
             write_to_file(newData)
         end
     end)
-    print("Logging dwarf positions every 1 week...")
+
+    -- set enabled
     enabled = true
+    -- update user
+    print("Logging dwarf positions every 1 week...")
 else
+    -- if module is not enabled
     -- cancel script repeat
     repeatUtil.cancel(modId .. 'every 1wk')
-    print("Stopped logging dwarf positions")
+
+    -- set enabled
     enabled = false
+    -- update user
+    print("Stopped logging dwarf positions")
 end

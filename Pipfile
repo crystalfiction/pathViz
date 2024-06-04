@@ -28,6 +28,7 @@ watchdog = "==4.0.1"
 xmltodict = "==0.13.0"
 typer = "*"
 faker = "*"
+flask = "*"
 
 [dev-packages]
 

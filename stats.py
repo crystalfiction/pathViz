@@ -65,7 +65,7 @@ def get_stats(limit: int, orient: str):
 
     # return the list of stat values
     # for saving
-    return stats
+    return stats, output
 
 
 def dist_per_goal(df: DataFrame, limit: int, orient: str):
