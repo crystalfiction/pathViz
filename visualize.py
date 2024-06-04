@@ -34,6 +34,7 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
 
         # null fig for flagging
         fig = None
+        layout = None
         # if --limit 1 was passed, return error
         if limit == 1:
             return print("Limiting does not currently support --limit=1")
@@ -47,13 +48,13 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
                 return print("Heatmap does not support grouping by goal.")
 
             # if --heat create heatmap visual from snapshots
-            fig = create_heatmap(snapshots, limit, orient)
+            fig, layout = create_heatmap(snapshots, limit, orient)
         else:
             # else create scatter visual from snapshots
-            fig = create_scatter(snapshots, g, c, limit, orient)
+            fig, layout = create_scatter(snapshots, g, c, limit, orient)
 
         # return the plotly fig
-        return fig
+        return fig, layout
 
 
 def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
@@ -191,10 +192,14 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
             yaxis=dict(nticks=6),
             zaxis=dict(nticks=4),
         ),
+        paper_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=20, r=20, t=40, b=20),
     )
 
+    layout = fig.layout
+
     # return the figure
-    return fig
+    return fig, layout
 
 
 def create_heatmap(df: DataFrame, limit: int, orient: str):
@@ -298,5 +303,7 @@ def create_heatmap(df: DataFrame, limit: int, orient: str):
         ),
     )
 
+    layout = fig.layout
+
     # return the figure
-    return fig
+    return fig, layout
