@@ -34,16 +34,20 @@ def trySetup(dfPath, dataDir, outputDir, hackScript):
         if found:
             data_path = os.getcwd() + "\\" + dataDir.replace("/", "\\")
             prefix = data_path.replace("\\", "\\\\")
-            newLine = re.sub(r"(?<=\")(?=\")", re.escape(prefix), str(line))
+            newLine = re.sub(r"(?<=\").*(?=\")", re.escape(prefix), str(line))
 
-            newLines.append(newLine)
+            # if the same directory
+            if newLine == re.escape(prefix):
+                # return
+                print("logPaths.lua already updated...")
+                return None
+            else:
+                newLines.append(newLine)
         else:
             newLines.append(line)
 
     # if no changes to be made
-    if lines == newLines:
-        print("logPaths.lua filePrefix already updated...")
-    else:
+    if lines != newLines:
         # write the changes
         with open(hackScript, "w") as f:
             for line in newLines:

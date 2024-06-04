@@ -7,6 +7,8 @@ import time
 import pandas as pd
 from rich.progress import track
 
+from snapshot import make_snapshot
+
 
 GOAL_KEY = {}
 
@@ -21,7 +23,7 @@ def parse(dir: str):
     # read the logs
     logData, logCount = read_logs(dir)
     # make snapshots of the logData
-    make_snapshots(logData)
+    make_snapshot(logData)
 
     return logData, logCount
 
@@ -30,7 +32,7 @@ def read_logs(dir: str):
     """
     Reads logs in the passed dir
 
-    Returns dict where {key: snapshotName, value: snapshotDataFrame
+    Returns tuple ({key: snapshotName, value: snapshotDataFrame}, logCount)
     """
 
     # list to append new scriptLog entries
@@ -112,63 +114,3 @@ def test_log(log: str):
 
     # returns True if log exists in scriptLog, else False
     return parsed
-
-
-def make_snapshots(logs: dict):
-    """
-    Accepts formatted logs from read_logs
-    and creates/updates snapshots.csv & snapshots.json
-    """
-    # list of dataframes combine into final_df
-    new_logs = []
-    # for each snapshot in the logs dict
-    for snapshot in logs.keys():
-        # get the snapshot's dataframe
-        new_log = logs[snapshot].reset_index(drop=True)
-        # then append to new_logs
-        new_logs.append(new_log)
-
-    # if new_logs exist...
-    logs_df = None
-    if len(new_logs) > 0:
-        # if more than 1 new_log...
-        if len(new_logs) > 1:
-            # concat to 1 dataframe
-            logs_df = pd.concat(new_logs)
-
-        # if only 1 new log...
-        else:
-            # logs_df = single new_log
-            logs_df = new_logs[0]
-
-    # if snapshots csv already exists...
-    # to be used as the returned DataFrame
-    final_df = None
-
-    # if new_logs...
-    if logs_df is not None:
-        print("Making snapshots...")
-
-        # if snapshots file exists
-        if os.path.exists("snapshots.csv"):
-            # combine new logs with existing
-            existing = pd.read_csv("snapshots.csv").drop(columns=["Unnamed: 0"])
-            # then set final_df to combined frame
-            final_df = pd.concat([existing, logs_df]).reset_index(drop=True)
-
-        # else (if snapshots file not found)
-        else:
-            # initialize snapshots file
-            final_df = pd.concat(new_logs).reset_index(drop=True)
-
-        # ensure dtypes
-        final_df["snapshot"] = final_df["snapshot"].astype("str")
-
-        # prefix the path_ids with snapshot_id
-        final_df["path_id"] = (
-            final_df["snapshot"].astype("str") + "_" + final_df["path_id"].astype("str")
-        )
-
-        # create snapshot files
-        final_df.to_csv("snapshots.csv")
-        final_df.to_json("snapshots.json", orient="columns")

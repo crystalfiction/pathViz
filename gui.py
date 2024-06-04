@@ -14,6 +14,7 @@ from setup import trySetup
 from parse import parse
 from visualize import visualize
 from stats import get_stats
+from snapshot import save_snapshot
 from utils import clear_cache, save_data, clean_logs
 
 # load env vars
@@ -21,7 +22,7 @@ load_dotenv()
 
 # save env vars
 DF_PATH = ""
-DATA_DIR = os.getenv("DATA_DIR")
+DATA_DIR = os.getenv("DATA_DIR") + "logs/"
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 HACK_SCRIPT = "logPaths.lua"
@@ -111,6 +112,14 @@ def api():
             # save the stats
             save_data(OUTPUT_DIR, mode, stats)
             result["verbose"] = "Stats files generated in the output directory."
+
+        if mode == "snapshot":
+            # if snapshot mode...
+
+            # save the current snapshot
+            test = save_snapshot(DATA_DIR)
+            if test is not None:
+                result["verbose"] = "Snapshot saved. See " + test
 
         if mode == "clear":
             # try to clear the cache

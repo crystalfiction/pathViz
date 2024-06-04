@@ -18,6 +18,7 @@ const initModes = [
     'load',
     'viz',
     'stats',
+    'snapshot',
     'clear'
 ]
 
@@ -127,6 +128,20 @@ function GUI() {
                     setFakeLog(
                         (curr) => ([
                             now() + ": " + stats + "\n---" + "\nPlease be aware that stats files are generated on EVERY call to 'stats'."
+                        ])
+                    )
+                })
+        }
+        else if (currMode === "snapshot") {
+            fetch("/api?mode=snapshot", { method: "POST" })
+                .then((res) => res.json())
+                .then((data) => {
+                    const dataObj = { data }['data']
+                    setApiResult(dataObj)
+                    const verbose = dataObj.verbose
+                    setFakeLog(
+                        (curr) => ([
+                            now() + ": " + verbose
                         ])
                     )
                 })

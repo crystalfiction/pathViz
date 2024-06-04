@@ -92,19 +92,19 @@ def clear_cache():
         with open(SCRIPT_LOG, "w") as log:
             # close the log and reset contents
             log.close()
-    else:
-        raise ValueError()
 
     # print update
     print("Script cache cleared...")
 
     # remove snapshots
     try:
-        os.remove("snapshots.csv")
-        os.remove("snapshots.json")
+        os.remove("snapshot.csv")
+        os.remove("snapshot.json")
         print("Removed snapshots files...")
     except FileNotFoundError:
         print("No snapshots found, skipping...")
+    except Exception as err:
+        raise err
 
 
 def get_density(df: DataFrame):
