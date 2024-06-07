@@ -149,8 +149,17 @@ SeekEatingChair2        0.00
 -----------------------------------
 ```
 
+### Make a snapshot
+```bash
+python cli.py snapshot
+```
 
-### Clear your snapshots
+`snapshot` lets you create a new subset of log data, starting from the earliest log to the current point.
+- This is useful if you'd like to subset and compare certain time periods of log data
+- Using the `--saved` option with `viz` mode will additionally include all saved snapshots in the analysis, if any exist
+
+
+### Clear the memory
 ```bash
 python cli.py clear
 ```

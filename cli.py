@@ -20,7 +20,7 @@ load_dotenv()
 
 # save env vars
 DF_PATH = os.getenv("DF_PATH")
-DATA_DIR = os.getenv("DATA_DIR") + "logs/"
+DATA_DIR = os.getenv("DATA_DIR")
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 HACK_SCRIPT = "logPaths.lua"
@@ -54,6 +54,7 @@ def CLI(
     orient: Annotated[
         str, typer.Option(help="How to orient the snapshot limit ['top'|'btm']")
     ] = "btm",
+    saved: Annotated[bool, typer.Option(help="Include saved snapshot data")] = False,
 ):
     """
     Accepts a 'mode' along with options
@@ -82,13 +83,13 @@ def CLI(
         # if load...
 
         # cleanup any empty logs...
-        clean_logs(DATA_DIR)
+        clean_logs(DATA_DIR + "logs/")
 
         # try to parse the logs...
         try:
             # if valid logs exist
             # then parse the logs in DATA_DIR
-            logData, logNames = parse(DATA_DIR)
+            logData, logNames = parse(DATA_DIR + "logs/")
             # print update
             print("Done.")
         except KeyError:
@@ -98,13 +99,9 @@ def CLI(
     elif mode == "viz":
         # if viz mode...
 
-        # break if no snapshots
-        if not os.path.exists("snapshot.csv"):
-            return print("No data loaded, please run load.")
-
         # call visualize, pass CLI options
         # and save Plotly figure to fig
-        fig, layout = visualize(g, c, heat, limit, orient)
+        fig, layout = visualize(g, c, heat, limit, orient, saved)
 
         # if save option passed...
         if s:

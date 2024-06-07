@@ -19,7 +19,7 @@ col_pal_iter = itertools.cycle(col_pal)
 GOAL_KEY = {}
 
 
-def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
+def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str, saved: bool):
     """
     Reads snapshot data and creates visuals depending on
     passed options.
@@ -27,11 +27,42 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
     Returns fig as type plotly Figure
     """
     # make sure snapshots exist
+    snapshots = None
     if os.path.exists("snapshot.csv"):
-
         # read snapshots from snapshots.csv
         snapshots = pd.read_csv("snapshot.csv").drop(columns=["Unnamed: 0"])
 
+    # check if include saved snapshots
+    if saved:
+        # get the saved snapshots
+        DATA_DIR = os.getenv("DATA_DIR")
+        saved_shots = os.listdir(DATA_DIR)
+        combined = []
+        for s in saved_shots:
+            if s != "logs":
+                # get the dataframe
+                s_df = pd.read_csv(DATA_DIR + s + "/" + "snapshot.csv").drop(
+                    columns=["Unnamed: 0"]
+                )
+                combined.append(s_df)
+
+        # if no saved snapshots...
+        if not len(combined):
+            print("No existing snapshots or log data found. Please run load.")
+            return None, None
+        # else if at least 1 snapshot
+        else:
+            # and if snapshots.csv already exists
+            if snapshots is not None:
+                combined_df = pd.concat(combined)
+                snapshots = pd.concat([snapshots, combined_df])
+            # otherwise, combined_df is snapshot
+            else:
+                combined_df = pd.concat(combined)
+                snapshots = combined_df
+
+    # if snapshot data
+    if snapshots is not None:
         # null fig for flagging
         fig = None
         layout = None
@@ -55,6 +86,10 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
 
         # return the plotly fig
         return fig, layout
+    # if no snapshot data...
+    else:
+        print("No data found. Please run load.")
+        return None, None
 
 
 def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
