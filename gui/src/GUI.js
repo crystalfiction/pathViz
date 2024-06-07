@@ -33,7 +33,6 @@ function now() {
     return now
 }
 
-
 function GUI() {
     // gui state
     const [loading, setLoading] = useState(true)

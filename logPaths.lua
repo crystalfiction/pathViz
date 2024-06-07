@@ -9,7 +9,7 @@ local repeatUtil = require("repeat-util")
 -- define modId
 local modId = "logPaths"
 -- define filePrefix to pathViz/ data directory
-local filePrefix = ""
+local filePrefix = "C:\\Users\\rocke\\Documents\\pathViz\\data\\logs\\"
 
 -- assert enabled
 enabled = enabled or false

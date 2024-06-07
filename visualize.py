@@ -27,10 +27,10 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str):
     Returns fig as type plotly Figure
     """
     # make sure snapshots exist
-    if os.path.exists("snapshots.csv"):
+    if os.path.exists("snapshot.csv"):
 
         # read snapshots from snapshots.csv
-        snapshots = pd.read_csv("snapshots.csv").drop(columns=["Unnamed: 0"])
+        snapshots = pd.read_csv("snapshot.csv").drop(columns=["Unnamed: 0"])
 
         # null fig for flagging
         fig = None
@@ -192,7 +192,6 @@ def create_scatter(df: DataFrame, g: bool, c: bool, limit: int, orient: str):
             yaxis=dict(nticks=6),
             zaxis=dict(nticks=4),
         ),
-        paper_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=20, r=20, t=40, b=20),
     )
 

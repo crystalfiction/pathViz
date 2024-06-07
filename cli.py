@@ -99,7 +99,7 @@ def CLI(
         # if viz mode...
 
         # break if no snapshots
-        if not os.path.exists("snapshots.csv"):
+        if not os.path.exists("snapshot.csv"):
             return print("No data loaded, please run load.")
 
         # call visualize, pass CLI options
@@ -121,7 +121,7 @@ def CLI(
         # if stats mode...
 
         # break if no snapshots
-        if not os.path.exists("snapshots.csv"):
+        if not os.path.exists("snapshot.csv"):
             return print("No data loaded, please run load.")
 
         stats, verbose = get_stats(limit, orient)
