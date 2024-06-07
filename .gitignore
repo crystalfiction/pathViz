@@ -15,6 +15,7 @@ data/*
 output/*
 snapshots.*
 scriptLog.txt
+tests/*
 
 # react misc
 gui/.DS_Store

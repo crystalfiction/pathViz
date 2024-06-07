@@ -16,7 +16,7 @@ GOAL_KEY = {}
 def parse(dir: str):
     """
     Parse logs in the passed dir,
-    then makes aggregated snapshots files.
+    then makes aggregated snapshots file.
 
     Returns logData: dict, logCount: int, regardless of parsing results
     """

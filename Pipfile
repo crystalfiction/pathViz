@@ -29,6 +29,8 @@ xmltodict = "==0.13.0"
 typer = "*"
 faker = "*"
 flask = "*"
+code2flow = "*"
+prospector = "*"
 
 [dev-packages]
 ipykernel = "*"

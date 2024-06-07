@@ -14,6 +14,7 @@ from stats import get_stats
 from utils import clear_cache, save_data, clean_logs
 from setup import trySetup
 from snapshot import save_snapshot
+from monitor import OnWatch
 
 # load env vars
 load_dotenv()
@@ -64,29 +65,24 @@ def CLI(
         --limit: limit the number of snapshots visualized
         --orient: orient the snapshot limitation by
             'top' (earliest) or 'btm' (latest)
+        --saved: include saved snapshots in request
     """
-    # ensure valid dfPath
-    if DF_PATH:
-        if not os.path.exists(DF_PATH):
-            return print("Could not locate the provided DF_PATH directory.")
-    else:
-        pass
 
     # try to setup files
     try:
         result = trySetup(DF_PATH, DATA_DIR, OUTPUT_DIR, HACK_SCRIPT)
     except Exception as err:
-        return print(f"Error setting up files {err}")
+        return print("Error locating DF_DIR directory. Please check .env")
 
     # evaluate passed mode
     if mode == "load":
         # if load...
 
-        # cleanup any empty logs...
-        clean_logs(DATA_DIR + "logs/")
-
         # try to parse the logs...
         try:
+            # cleanup any empty logs...
+            clean_logs(DATA_DIR + "logs/")
+
             # if valid logs exist
             # then parse the logs in DATA_DIR
             logData, logNames = parse(DATA_DIR + "logs/")
@@ -94,7 +90,7 @@ def CLI(
             print("Done.")
         except KeyError:
             # else no valid logs exist in DATA_DIR
-            return print("No valid data exists in the provided DATA_DIR.")
+            return print(f"No valid data exists in {DATA_DIR}")
 
     elif mode == "viz":
         # if viz mode...
