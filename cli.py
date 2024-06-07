@@ -13,13 +13,14 @@ from visualize import visualize
 from stats import get_stats
 from utils import clear_cache, save_data, clean_logs
 from setup import trySetup
+from snapshot import save_snapshot
 
 # load env vars
 load_dotenv()
 
 # save env vars
 DF_PATH = os.getenv("DF_PATH")
-DATA_DIR = os.getenv("DATA_DIR")
+DATA_DIR = os.getenv("DATA_DIR") + "logs/"
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 HACK_SCRIPT = "logPaths.lua"
@@ -34,6 +35,7 @@ class Modes(str, Enum):
     viz = "viz"
     clear = "clear"
     stats = "stats"
+    snapshot = "snapshot"
 
 
 def CLI(
@@ -97,7 +99,7 @@ def CLI(
         # if viz mode...
 
         # break if no snapshots
-        if not os.path.exists("snapshots.csv"):
+        if not os.path.exists("snapshot.csv"):
             return print("No data loaded, please run load.")
 
         # call visualize, pass CLI options
@@ -119,7 +121,7 @@ def CLI(
         # if stats mode...
 
         # break if no snapshots
-        if not os.path.exists("snapshots.csv"):
+        if not os.path.exists("snapshot.csv"):
             return print("No data loaded, please run load.")
 
         stats, verbose = get_stats(limit, orient)
@@ -128,6 +130,14 @@ def CLI(
         if s:
             # save the stats
             save_data(OUTPUT_DIR, mode, stats)
+
+    elif mode == "snapshot":
+        # if snapshot mode...
+
+        # save the current snapshot
+        result = save_snapshot(DATA_DIR)
+        if result is not None:
+            print(f"New snapshot made. See {result}")
 
     elif mode == "clear":
         # if clear mode...

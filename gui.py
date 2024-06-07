@@ -14,6 +14,7 @@ from setup import trySetup
 from parse import parse
 from visualize import visualize
 from stats import get_stats
+from snapshot import save_snapshot
 from utils import clear_cache, save_data, clean_logs
 
 # load env vars
@@ -21,7 +22,7 @@ load_dotenv()
 
 # save env vars
 DF_PATH = ""
-DATA_DIR = os.getenv("DATA_DIR")
+DATA_DIR = os.getenv("DATA_DIR") + "logs/"
 OUTPUT_DIR = os.getenv("OUTPUT_DIR")
 SCRIPT_LOG = "scriptLog.txt"
 HACK_SCRIPT = "logPaths.lua"
@@ -60,7 +61,7 @@ def api():
 
             # if logs were parsed or data exists
             # save snapshots.json as response data
-            f = open("snapshots.json")
+            f = open("snapshot.json")
             data = json.load(f)
             result["data"] = data
             result["count"] = count
@@ -71,7 +72,7 @@ def api():
         if mode == "viz":
             # if viz mode...
             # break if no snapshots
-            if not os.path.exists("snapshots.csv"):
+            if not os.path.exists("snapshot.csv"):
                 result["status"] = False
                 result["verbose"] = "No data found, please run load."
                 return result
@@ -84,6 +85,11 @@ def api():
             limit = 0
             orient = "btm"
             fig, layout = visualize(g, c, heat, limit, orient)
+
+            # update fig for GUI viz
+            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)")
+            fig = fig
+            layout = fig.layout
 
             # if save option passed...
             # if s:
@@ -112,6 +118,14 @@ def api():
             save_data(OUTPUT_DIR, mode, stats)
             result["verbose"] = "Stats files generated in the output directory."
 
+        if mode == "snapshot":
+            # if snapshot mode...
+
+            # save the current snapshot
+            test = save_snapshot(DATA_DIR)
+            if test is not None:
+                result["verbose"] = "Snapshot saved. See " + test
+
         if mode == "clear":
             # try to clear the cache
             try:
@@ -135,6 +149,10 @@ def setup():
     # if get request
     if request.method == "GET":
         result = {"status": True, "data": ""}
+
+        dfEnv = os.getenv("DF_PATH")
+        if dfEnv != "":
+            result["isSetup"] = trySetup(dfEnv, DATA_DIR, OUTPUT_DIR, HACK_SCRIPT)
 
         # if a dfPath is in the session
         if "dfPath" in session:
