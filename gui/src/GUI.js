@@ -13,6 +13,7 @@ import Plot from 'react-plotly.js'
 import { ReactTyped } from 'react-typed'
 
 import Setup from './Setup'
+import THREEViz from './THREEViz'
 
 const initModes = [
     'load',
