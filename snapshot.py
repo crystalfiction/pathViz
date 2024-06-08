@@ -99,7 +99,7 @@ def make_snapshot(logs: dict):
 
         # ensure dtypes
         final_df["snapshot"] = final_df["snapshot"].astype("str")
-        final_df["path_id"].astype("str")
+        final_df["path_id"] = final_df["path_id"].astype("str")
 
         # prefix the path_ids with snapshot_id
         final_df["path_id"] = final_df["snapshot"] + "_" + final_df["path_id"]

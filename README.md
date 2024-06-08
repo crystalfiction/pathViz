@@ -19,112 +19,183 @@ Related resources include:
 
 ## Setup
 
-Dependencies:
-- [Python 3.10.11](https://www.python.org/downloads/release/python-31011/)
-- [pip](https://pypi.org/project/pip/)
-- [DFHack](https://docs.dfhack.org/en/stable/docs/Installing.html#installing) - can be installed directly from Steam, if using DF premium
+Install [Python 3.10.11](https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64.exe)
+1. Check the box `Add python.exe to system PATH` at the bottom
+2. Then hit `Install Now`
 
-> [pipenv 2023.12.1](https://pypi.org/project/pipenv/2023.12.1/) is an additional package management dependency installed automatically when running the startup script `./pathViz.ps1` with Powershell.
-
-First, download the latest release of [pathViz](https://github.com/crystalfiction/pathViz/releases) to an easily accessible directory. *Make sure this directory is not within a cloud drive, or you will most likely encounter file permissions issues.*
-
-See below depending on `GUI` or `CLI` usage.
-
-## GUI
-
-> ***The `GUI` does not currently support visualization options, and will only output the default visualization type.***
-
-For the `GUI`, there is minimal setup involved. All you need to do is locate the `pathViz.ps1` file and run it with `Powershell`.
-
-You can do this via the File Explorer by right-clicking the file and selecting `Run with Powershell`, or you can open up your command-line and run `./pathViz.ps1`.
-
-When prompted, enter `gui`.
-
-> ***IMPORTANT***<br>
-> If Dwarf Fortress is already running, you will need to go into the game, open the dfhack console with `ctrl-shift-p`, and run
-> ```lua
-> :lua require('script-manager').reload()
+> Verify the correct version of Python is installed by opening `Terminal` and running the code below. Then, verify its output is `Python 3.10.11`.
+> ```bash
+> # running this
+> python -V
 > ```
->
-> This tells dfhack to reload all scripts in the `dfhack/scripts/` directory, ensuring that pathViz is recognized.
 
-Enter the path to your Dwarf Fortress game directory, then follow the `gui` instructions.
+Once the correct version of `Python` is installed, download the latest release of pathViz [here](https://github.com/crystalfiction/pathViz/releases). ***Make sure the location you download it to isn't within OneDrive or a cloud directory.***
 
-To end the session, from the `Powershell` window press `ctrl-c` (press twice to double check the process was aborted).
+A [Simple](#simple) setup is provided below for those with minimal-no programming experience. Otherwise, see [Full](#full).
 
-## CLI
+### Simple
 
-Locate the `pathViz/.env` file, insert the path to your Dwarf Fortress game directory to `DF_PATH`, and observe its other variables
-- `DF_PATH`: the system path to your Dwarf Fortress game directory
-- `DATA_DIR`: the directory in which pathViz will log path data from the game
-- `OUTPUT_DIR`: the directory in which pathViz will save generated visuals and statistics
-- ***You do not need to change these, unless you would prefer alternative directory names***
-<br>
+> Simple setup provides the quickest way to get `pathViz` up and running. However, it only supports `GUI` interaction. See `Full` for `CLI` usage.
 
-Once you've specified the `DF_PATH`, you need to run the `pathViz.ps1` file at least once via `Powershell`, then specify the `cli` option when prompted.
+Screenshots of the setup process can be found [here](simple_setup.md).
 
-This automatically initializes the `DFHack` script `logPaths.lua` and places it in the necessary directory of your game folder.
+Un-zip the `pathViz.zip` file, then `right-click` on the folder and select `Open in Terminal`.
 
-> ***IMPORTANT***<br>
-> If Dwarf Fortress is already running, you will need to go into the game, open the dfhack console with `ctrl-shift-p`, and run
-> ```lua
-> :lua require('script-manager').reload()
-> ```
->
-> This tells dfhack to reload all scripts in the `dfhack/scripts/` directory, ensuring that pathViz is recognized.
-
-### Start logging paths...
-From the dfhack console (`ctrl-shift-p`) run
-```lua
--- logs paths once per in-game week
--- the current day when enabled is the first snapshot
-enable logPaths
+In the `Terminal`, run
+```bash
+./pathViz.ps1
 ```
 
-### Load some data
+> **If running `./pathViz.ps1` does _not_ work:**
+> <br>
+> Please put in an Issue -> Bug Report, or DM me directly via [Reddit](https://www.reddit.com/user/crystalfiction/)
+
+Once `pathViz`'s dependencies are done installing, the `GUI` should automatically start within a new browser window/tab. Follow the `GUI` instructions to complete setup, and see below for [Usage](#usage).
+
+
+### Full
+
+> Full setup will allow usage with both the `CLI` & `GUI` modules, but requires prior experience navigating the command-line and editing scripts.
+
+Un-zip the `pathViz` archive and start installing its dependencies:
 ```bash
-# make sure your terminal is still in the pipenv shell
+# make sure you're in the pathViz directory
+cd <path_to_pathViz>/pathViz
+
+# install pipenv to manage Python packages + venv
+pip install pipenv
+
+# install dependencies with pipenv
+pipenv install
+
+# finally, start the pipenv virtual environment
+pipenv shell
+```
+
+Locate the `.env` file and see comments below:
+```bash
+# locate the system path to your Dwarf Fortress
+# game directory, then set DF_PATH to the system path
+DF_PATH=""
+# for example...
+EXAMPLE_DF_PATH="C:\Program Files (x86)\Steam\steamapps\common\Dwarf Fortress"
+
+# optional variables specifying the directory
+# names pathViz will use to write data
+DATA_DIR="data/"
+OUTPUT_DIR="output/"
+```
+
+If you are planning on using the `GUI`, make sure to install the `NPM` packages as well
+```bash
+# go into the GUI app and install node packages
+cd gui
+npm install
+
+# return to the root directory
+cd ..
+```
+
+> The `GUI` can then be accessed at any time via
+> ```bash
+> python gui.py
+> ```
+
+To verify your setup, try to load some log data (which shouldn't exist yet)
+```bash
 python cli.py load
 ```
 
-### Visualize some data
-```bash
-python cli.py viz
+Locate your DF directory that you provided in the `.env` file, then go to `.../Dwarf Fortress/hack/scripts` and check that `logPaths.lua` exists.
+
+To verify further... open `logPaths.lua` and ensure...
+```lua
+// default
+local filePrefix = ""
+
+// is updated to (using default directory names)...
+local filePrefix = "C:\\<path_to_pathViz>\\data\\logs\\"
 ```
 
-Accepted arguments:
-- `--g` - color each unique path by its path goal - Default: `False`
-- `--c`: generate clusters for each snapshot using KMeans - Default: `False`
-- `--heat`: generate a heatmap using the entire snapshot collection - Default: `False`
-- `--limit`: limit the number of snapshots visualized - Default: `0`
-- `--orient`: orient the limitation by "top," starting from the earliest snapshot, or "btm" starting from the latest - Default: `btm`
+See below for [Usage](#usage).
 
-Simple example
+## Usage
+
+Once `pathViz` is setup, workflow mainly revolves around:
+- telling `pathViz` to start or stop logging paths
+- doing something with the path data, depending on the mode selected
+
+### Start logging paths
+> ***IMPORTANT***<br>
+> If your game client was running during the setup process...
+> In your game client, open the `DFHack` console by pressing `ctrl-shift-p`, then run the lua code below to rescan all `DFHack` scripts
+> ```lua
+> :lua require('script-manager').reload()
+> ```
+
+When `logPaths` is enabled, it will immediately log all active paths in-game, then continue to log them once every 7 days in-game.
+
+- enable or disable the `logPaths` script by running `enable logPaths` or `disable logPaths` from the `DFHack` console, respectively.
+- Check whether the `logPaths` script is enabled by running `logPaths` at any time from the `DFHack` console.
+
+
+### Modes
+
+> If using the `CLI`, help can be viewed at any time via `python cli.py --help`.
+
+#### Load
+`load` parses and logs each log file's path data to the current `snapshot`.
+- A `snapshot` is a collection of paths, grouped by the in-game date in which they were logged.
+
+##### CLI Usage
 ```bash
-# limit to 3 snapshots: --limit 3,
-# starting from the latest snapshot: --orient btm
-python cli.py viz --limit 3 --orient btm
+python cli.py load
 ```
 
-More complex example
+#### Viz
+`viz` analyses existing path data and generates a visual depending on the passed `options`.
+- Currently, the `GUI` only supports default visuals, so there are no `options` to pass.
+- By default, the generated visual groups paths by the week in which they were logged.
+
+##### CLI Usage
+Available `options`:
+- `--g`: group paths by Path Goal (the activity associated with the individual path)
+- `--c`: generate K-Means clusters for each snapshot. 
+  - K-Means clustering is useful in evaulating the overall 'similarity' of paths between logs. Each group will contain a `cluster` which represents the "estimated central point" of each `log`'s paths.
+- `--heat`: generate a heatmap, highlighting areas which are most likely to contain high path density.
+- `--limit`: limit the number of `logs` used when generating a visual; Default: `0`.
+- `--orient`: orient the `logs` limitation, where `top` is the earliest `log` recorded and `btm` is the latest; Default: `btm`.
+- `--saved`: specify whether to include all saved & current snapshots, or just current. By default, only the current snapshot is included.
+
 ```bash
-# limit to 10 snapshots: --limit 10,
-# starting from the earliest(top) snapshot: --orient top,
-# including snapshot clusters: --c,
-# grouped by goal: --g
-python cli.py viz --limit 4 --orient btm --c --g
+# generate a visual,
+# limit to 10 logs,
+# starting from the earliest log
+python cli.py viz --limit 10 --orient top
+
+# generate a visual
+# limit to 5 logs,
+# starting from the latest log,
+# and generate clusters
+python cli.py viz --limit 5 --orient btm --c
 ```
 
-The output, using my fort as data
-![newFort_example_viz](images/newFort_example_viz.png)
+#### Stats
 
-### Generate some stats
+`stats` analyses existing path data and generates some key metrics.
+- When run through the `GUI`, the returned stats are saved as individual files in the `output/` folder.
+
+##### CLI Usage
+Available `options`:
+- `--limit`: limit the number of `logs` used when generating stats; Default: `0`.
+- `--orient`: orient the `logs` limitation, where `top` is the earliest `log` recorded and `btm` is the latest; Default: `btm`.
+- `--saved`: specify whether to include all saved & current snapshots, or just current. By default, only the current snapshot is included.
+
 ```bash
+# generate some stats
 python cli.py stats
-```
 
-Returned stats example
-```bash
+## EXAMPLE OUTPUT
 -----------------------------------
 pathViz Stats
 -----------------------------------
@@ -149,25 +220,29 @@ SeekEatingChair2        0.00
 -----------------------------------
 ```
 
-### Make a snapshot
+#### Snapshot
+
+`snapshot` provides a way to subset your path data by moving it to its own unique directory. This is mostly useful when you have logged a series of paths and would like to separate them from a new, incoming series (i.e. comparing time periods).
+
+- If `DATA_DIR` was not changed from the default value, each `snapshot` will be located at `data/<snapshot_name>/`.
+  - The directory contains files representing this `snapshot`'s path data (both `.csv` & `.json`).
+
+##### CLI Usage
 ```bash
 python cli.py snapshot
 ```
 
-`snapshot` lets you create a new subset of log data, starting from the earliest log to the current point.
-- This is useful if you'd like to subset and compare certain time periods of log data
-- Using the `--saved` option with `viz` mode will additionally include all saved snapshots in the analysis, if any exist
 
+#### Clear
 
-### Clear the memory
+`clear` wipes the current `snapshot` from memory.
+- ***It does not remove path log files.***
+  - This means that if you would like to delete any recorded paths, you will have to do so manually by deleting the file containing them located in `data/logs/`
+
+##### CLI Usage
 ```bash
 python cli.py clear
 ```
-
-`clear` mode intentionally leaves path log files in the `DATA_DIR` persistent.
-- This means you <u>_will need to manually relocate log files in the `DATA_DIR` if you do not want them considered when `load` is called_</u>
-- Either back them up to a new folder, or simply delete them
-
 
 ## Screenshots
 

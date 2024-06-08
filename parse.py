@@ -85,6 +85,8 @@ def read_logs(dir: str):
     # if new logs found, update user
     if logCount > 0:
         print("Writing data file names to cache...")
+    else:
+        print("No new logs detected...")
 
     # open scriptLog.txt...
     with open("scriptLog.txt", "a") as f:

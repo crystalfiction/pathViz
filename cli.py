@@ -14,7 +14,6 @@ from stats import get_stats
 from utils import clear_cache, save_data, clean_logs
 from setup import trySetup
 from snapshot import save_snapshot
-from monitor import OnWatch
 
 # load env vars
 load_dotenv()
@@ -70,7 +69,8 @@ def CLI(
 
     # try to setup files
     try:
-        result = trySetup(DF_PATH, DATA_DIR, OUTPUT_DIR, HACK_SCRIPT)
+        print("Checking files...")
+        result = trySetup(DF_PATH, DATA_DIR + "logs/", OUTPUT_DIR, HACK_SCRIPT)
     except Exception as err:
         return print("Error locating DF_DIR directory. Please check .env")
 
