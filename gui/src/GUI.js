@@ -82,10 +82,10 @@ function GUI() {
 
                 // after api fetch
                 setApiResult(dataObj)
-                const count = dataObj.count
+                const verbose = dataObj.verbose
                 setFakeLog(
                     (curr) => ([
-                        now() + ": " + count + " new logs parsed."
+                        now() + ": " + verbose
                     ])
                 )
             }

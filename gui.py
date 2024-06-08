@@ -57,17 +57,19 @@ def api():
             except Exception as err:
                 # raise error if error unknown
                 result["status"] = False
-                result["data"] = "Unkown error occurred while parsing logs"
+                result["data"] = "Unkown error occurred while parsing logs."
 
             # if logs were parsed or data exists
             # save snapshots.json as response data
-            f = open("snapshot.json")
-            data = json.load(f)
-            result["data"] = data
-            result["count"] = count
-            f.close()
-            # flag success
-            result["status"] = True
+            if count > 0:
+                f = open("snapshot.json")
+                data = json.load(f)
+                result["data"] = data
+                result["verbose"] = str(count) + " new logs parsed."
+                f.close()
+            else:
+                result["status"] = False
+                result["verbose"] = "No log data found."
 
         if mode == "viz":
             # if viz mode...
