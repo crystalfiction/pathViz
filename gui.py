@@ -69,15 +69,10 @@ def api():
                 f.close()
             else:
                 result["status"] = False
-                result["verbose"] = "No log data found."
+                result["verbose"] = "No new log data found."
 
         if mode == "viz":
             # if viz mode...
-            # break if no snapshots
-            if not os.path.exists("snapshot.csv"):
-                result["status"] = False
-                result["verbose"] = "No data found, please run load."
-                return result
 
             # call visualize, pass CLI options
             # and save Plotly figure to fig
@@ -86,7 +81,8 @@ def api():
             heat = False
             limit = 0
             orient = "btm"
-            fig, layout = visualize(g, c, heat, limit, orient)
+            saved = True
+            fig, layout = visualize(g, c, heat, limit, orient, saved)
 
             # update fig for GUI viz
             fig.update_layout(paper_bgcolor="rgba(0,0,0,0)")

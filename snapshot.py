@@ -17,7 +17,7 @@ def save_snapshot(dir: str):
     fileName = current_time
 
     # format passed dir
-    dir_fmt = dir + fileName + "/"
+    dir_fmt = dir.replace("logs/", "") + fileName + "/"
 
     # copy the snapshot to a new snapshot folder
     files = []

@@ -226,6 +226,7 @@ SeekEatingChair2        0.00
 
 - If `DATA_DIR` was not changed from the default value, each `snapshot` will be located at `data/<snapshot_name>/`.
   - The directory contains files representing this `snapshot`'s path data (both `.csv` & `.json`).
+- Once a `snapshot` is made, the `log` files will need to be manually relocated, if you don't want them considered when running `load` next.
 
 ##### CLI Usage
 ```bash

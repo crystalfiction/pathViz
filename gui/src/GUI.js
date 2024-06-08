@@ -13,7 +13,6 @@ import Plot from 'react-plotly.js'
 import { ReactTyped } from 'react-typed'
 
 import Setup from './Setup'
-import THREEViz from './THREEViz'
 
 const initModes = [
     'load',
@@ -226,9 +225,9 @@ function GUI() {
     )
 
     return (
-        <Container fluid className='h-100 d-flex align-items-center justify-content-center'>
+        <Container fluid className='w-100 h-100 d-flex align-items-center justify-content-center'>
             {logHist.current[0] && (
-                <div className='position-fixed w-25 start-0 bottom-0 text-muted fst-italic' style={{ lineHeight: 1.2 }}>
+                <div className='position-fixed w-25 start-0 bottom-0 fst-italic mb-1 ms-2 p-2 shadow-lg' style={{ lineHeight: 1.2, opacity: 0.9, backgroundColor: "rgba(0, 0, 0, 0.7)" }}>
                     {logHist.current.length && logHist.current.map((l, i) => <p key={i} className='m-0'>{l}</p>)}
                 </div>
             )}
