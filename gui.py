@@ -84,11 +84,6 @@ def api():
             saved = True
             fig, layout = visualize(g, c, heat, limit, orient, saved)
 
-            # update fig for GUI viz
-            fig.update_layout(paper_bgcolor="rgba(0,0,0,0)")
-            fig = fig
-            layout = fig.layout
-
             # if save option passed...
             # if s:
             #     # save the figure
@@ -96,9 +91,17 @@ def api():
 
             # check that the figure exists...
             if fig is not None:
+                # update fig for GUI viz
+                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)")
+                fig = fig
+                layout = fig.layout
+
                 # if so, set to result
                 result["fig"] = fig.to_json()
                 result["layout"] = layout.to_json()
+            else:
+                result["verbose"] = "No data found. Please run load."
+                result["status"] = False
 
         if mode == "stats":
             # if stats mode...

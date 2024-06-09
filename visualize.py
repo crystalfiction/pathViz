@@ -48,8 +48,13 @@ def visualize(g: bool, c: bool, heat: bool, limit: int, orient: str, saved: bool
 
         # if no saved snapshots...
         if not len(combined):
-            print("No existing snapshots or log data found. Please run load.")
-            return None, None
+            # if current snapshot
+            if snapshots is not None:
+                pass
+            else:
+                # if no saved or current snapshot
+                print("No data found. Please run load.")
+                return None, None
         # else if at least 1 snapshot
         else:
             # and if snapshots.csv already exists
