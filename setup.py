@@ -7,7 +7,9 @@ def trySetup(dfPath, dataDir, outputDir, hackScript):
     """"""
     # try to create the directories
     try:
-        # dataDir
+        root_data_dir = dataDir.replace("logs/", "")
+        if not os.path.exists(root_data_dir):
+            os.mkdir(root_data_dir)
         if not os.path.exists(dataDir):
             os.mkdir(dataDir)
         # outputDir
